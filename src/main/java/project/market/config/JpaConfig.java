@@ -1,4 +1,4 @@
-package project.market;
+package project.market.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

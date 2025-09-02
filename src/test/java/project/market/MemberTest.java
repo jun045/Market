@@ -46,7 +46,7 @@ public class MemberTest extends AcceptanceTest {
 
         Member admin = Member.builder()
                 .loginId("admin")
-                .password(passwordEncoder.encode("1234"))
+                .password(passwordEncoder.encode("aAbB1234567890!"))
                 .name("관리자")
                 .nickname("관리자")
                 .email("admin@example.com")
@@ -57,7 +57,7 @@ public class MemberTest extends AcceptanceTest {
 
         Member user1 = Member.builder()
                 .loginId("user1")
-                .password(passwordEncoder.encode("1234"))
+                .password(passwordEncoder.encode("aAbB1234567890!"))
                 .name("유저1")
                 .nickname("유저1")
                 .email("user1@example.com")
@@ -68,7 +68,7 @@ public class MemberTest extends AcceptanceTest {
 
         Member user2 = Member.builder()
                 .loginId("user2")
-                .password(passwordEncoder.encode("1234"))
+                .password(passwordEncoder.encode("aAbB1234567890!"))
                 .name("유저2")
                 .nickname("유저2")
                 .email("user2@example.com")
@@ -96,7 +96,7 @@ public class MemberTest extends AcceptanceTest {
     public void 회원가입 (){
         UserSignupResponse userSignupResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new CreateUserSignupRequest("user3", "1234", "유저3", "유저3_n", "user3@example.com"))
+                .body(new CreateUserSignupRequest("user3", "aAbB1234567890!", "유저3", "유저3_n", "user3@example.com"))
                 .when()
                 .post("api/v1/members")
                 .then().log().all()
@@ -151,7 +151,7 @@ public class MemberTest extends AcceptanceTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + getToken("user1"))
-                .body(new UserPasswordRequest("1234", "5678", "5678"))
+                .body(new UserPasswordRequest("aAbB1234567890!", "aAbB1234567890#", "aAbB1234567890#"))
                 .when()
                 .patch("api/v1/members/me/password")
                 .then().log().all()
@@ -160,7 +160,7 @@ public class MemberTest extends AcceptanceTest {
         //재설정된 비밀번호로 로그인
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(new UserLoginRequest("user1", "5678"))
+                .body(new UserLoginRequest("user1", "aAbB1234567890#"))
                 .when()
                 .post("api/v1/members/login")
                 .then().log().all()
@@ -173,7 +173,7 @@ public class MemberTest extends AcceptanceTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + getToken("user1"))
-                .body(new DeleteUserRequest("1234"))
+                .body(new DeleteUserRequest("aAbB1234567890!"))
                 .when()
                 .delete("api/v1/members")
                 .then().log().all()

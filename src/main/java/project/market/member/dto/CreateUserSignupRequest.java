@@ -10,9 +10,9 @@ public record CreateUserSignupRequest(
         String loginId,
         @NotBlank @Size(min = 15, max = 30) @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\-{}\\[\\]:;\"'<>,.?/]).+$")  //대문자, 소문자, 숫자, 특수문자 조합 강제
         String password,
-        @NotBlank @Pattern(regexp = "^[a-zA-Z0-9_-]+$")
+        @NotBlank @Pattern(regexp = "^[a-zA-Z가-힣0-9_-]+$")  //대소문자, 한글, 숫자, _- 허용
         String name,
-        @Size(min = 2, max = 20) @Pattern(regexp = "^[a-zA-Z0-9_-]+$")  //대소문자, 숫자, _- 허용
+        @Size(min = 2, max = 20) @Pattern(regexp = "^[a-zA-Z가-힣0-9_-]+$")  //대소문자, 한글, 숫자, _- 허용
         String nickname,
         @NotBlank @Email
         String email) {

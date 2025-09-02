@@ -1,5 +1,6 @@
 package project.market.member.dto;
 
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 import project.market.member.enums.Level;
 import project.market.member.enums.MemberStatus;
@@ -17,5 +18,4 @@ public record UserSignupResponse(String loginId,
                                  MemberStatus memberStatus,
                                  int point,
                                  LocalDateTime createdAt) {
-
 }

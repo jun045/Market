@@ -1,5 +1,6 @@
 package project.market.member;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class MemberService {
     private final JwtProvider jwtProvider;
 
     //회원가입
-    public UserSignupResponse createUser(CreateUserSignupRequest request){
+    public UserSignupResponse createUser(@Valid CreateUserSignupRequest request){
         if (memberRepository.findByLoginId(request.loginId()).isPresent()){
             throw new RuntimeException("이미 존재하는 Id입니다.");
         }
@@ -54,7 +55,7 @@ public class MemberService {
 
     //회원정보 변경
     @Transactional
-    public UpdateUserResponse update (UpdateUserRequest request, Member member){
+    public UpdateUserResponse update (@Valid UpdateUserRequest request, Member member){
 
         Member user = memberRepository.findById(member.getId()).orElseThrow(
                 () -> new RuntimeException("자신의 회원정보만 수정할 수 있습니다.")
@@ -79,7 +80,7 @@ public class MemberService {
 
     //비밀번호 변경
     @Transactional
-    public void changePassword (UserPasswordRequest request, Member member){
+    public void changePassword (@Valid UserPasswordRequest request, Member member){
 
         Member user = memberRepository.findById(member.getId()).orElseThrow(
                 () -> new RuntimeException("자신의 회원정보만 수정할 수 있습니다.")

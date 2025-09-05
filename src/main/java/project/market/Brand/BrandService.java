@@ -3,6 +3,8 @@ package project.market.Brand;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import project.market.Brand.dto.BrandResponse;
+import project.market.Brand.dto.CreateBrandRequest;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package project.market.Brand;
+package project.market.Brand.dto;
 
 public record BrandResponse(Long id,
                             String name) {

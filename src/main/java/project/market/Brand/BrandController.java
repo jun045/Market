@@ -2,6 +2,8 @@ package project.market.Brand;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import project.market.Brand.dto.BrandResponse;
+import project.market.Brand.dto.CreateBrandRequest;
 
 import java.util.List;
 

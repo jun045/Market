@@ -6,12 +6,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import project.market.BaseEntity;
 
 @Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Brand {
+public class Brand extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

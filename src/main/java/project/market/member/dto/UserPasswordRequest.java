@@ -1,6 +1,11 @@
 package project.market.member.dto;
 
-public record UserPasswordRequest(String existingPassword,
-                                  String newPassword,
-                                  String confirmNewPassword) {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
+public record UserPasswordRequest(
+        String existingPassword,
+        @NotBlank @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\-{}\\[\\]:;\"'<>,.?/]).+$")
+        String newPassword,
+        String confirmNewPassword) {
 }

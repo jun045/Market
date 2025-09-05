@@ -1,5 +1,6 @@
 package project.market.member;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,7 +18,7 @@ public class MemberController {
 
     //회원가입
     @PostMapping("api/v1/members")
-    public UserSignupResponse signupUser (@RequestBody CreateUserSignupRequest request){
+    public UserSignupResponse signupUser (@Valid @RequestBody CreateUserSignupRequest request){
 
         return memberService.createUser(request);
     }
@@ -32,7 +33,7 @@ public class MemberController {
     //회원정보 수정
     @PutMapping("api/v1/members")
     public UpdateUserResponse updateUser (@AuthenticationPrincipal (expression = "member") Member member,
-                                          @RequestBody UpdateUserRequest request){
+                                          @Valid @RequestBody UpdateUserRequest request){
 
         return memberService.update(request, member);
     }
@@ -47,7 +48,7 @@ public class MemberController {
     //비밀번호 재설정
     @PatchMapping("api/v1/members/me/password")
     public ResponseEntity<Void> changeUserPassword (@AuthenticationPrincipal (expression = "member") Member member,
-                                                    @RequestBody UserPasswordRequest request){
+                                                    @Valid @RequestBody UserPasswordRequest request){
 
         memberService.changePassword(request, member);
 

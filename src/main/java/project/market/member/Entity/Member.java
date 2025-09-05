@@ -20,6 +20,7 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @Column(unique = true, nullable = false)
     private String loginId;
 
@@ -31,6 +32,7 @@ public class Member extends BaseEntity {
 
     private String nickname;
 
+    @NotNull
     @Column(unique = true, nullable = false)
     private String email;
 

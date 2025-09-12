@@ -4,6 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.market.Brand.BrandRepository;
+import project.market.member.Entity.Member;
+import project.market.member.MemberRepository;
+import project.market.member.enums.Role;
 import project.market.product.dto.CreateProductRequest;
 import project.market.product.dto.ProductResponse;
 import project.market.product.dto.ProductSearchResponse;
@@ -15,9 +18,20 @@ import java.util.List;
 public class ProductService {
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
+    private final MemberRepository memberRepository;
 
-    //등록
-    public ProductResponse create(CreateProductRequest request) {
+    //등록 - 관리자만 가능
+    public ProductResponse create(Member member, CreateProductRequest request) {
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("상품등록은 관리자만 할 수 있습니다.")
+        );
+
+        if (!user.getRole().equals(Role.SELLER)){
+            throw new IllegalArgumentException("상품등록은 관리자만 할 수 있습니다.");
+        }
+
+
         Product product = Product.builder()
                 .productName(request.name())
                 .description(request.description())
@@ -38,9 +52,18 @@ public class ProductService {
         );
     }
 
-    //수정
+    //수정 - 관리자만 가능
     @Transactional
-    public ProductResponse update(CreateProductRequest request, Long id) {
+    public ProductResponse update(Member member, CreateProductRequest request, Long id) {
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("상품 수정은 관리자만 할 수 있습니다.")
+        );
+
+        if (!user.getRole().equals(Role.SELLER)){
+            throw new IllegalArgumentException("상품 수정은 관리자만 할 수 있습니다.");
+        }
+
         Product productUpdate = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("상품 정보 찾을 수 없음"));
 
@@ -88,8 +111,17 @@ public class ProductService {
     }
 
 
-    //삭제
-    public void delete (Long id){
+    //삭제 - 관리자만 가능
+    public void delete (Member member, Long id){
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("상품 삭제는 관리자만 할 수 있습니다.")
+        );
+
+        if (!user.getRole().equals(Role.SELLER)){
+            throw new IllegalArgumentException("상품 삭제는 관리자만 할 수 있습니다.");
+        }
+
         productRepository.findById(id)
                 .orElseThrow(()->new IllegalArgumentException("상품 찾을 수 없음"));
 

@@ -52,7 +52,7 @@ public class Product extends BaseEntity {
     @ManyToOne
     private Category category;
 
-    //좋아요 개수
+    //좋아요 개수 -> service로직에 없어서 comment 처리
 //    private int likeCount;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -79,13 +79,13 @@ public class Product extends BaseEntity {
         this.listPrice = listPrice;
 //        this.salePrice = salePrice;
         this.productStatus = productStatus;
-        this.isDeleted = isDeleted;
+        this.isDeleted = false;
         this.category = category;
 //        this.likeCount = likeCount;
         this.optionVariants = optionVariants;
     }
 
-    //할인된 가격 계산
+
 
     //정보 수정
     public void update (

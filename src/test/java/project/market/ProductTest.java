@@ -21,6 +21,8 @@ import project.market.product.dto.*;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @ActiveProfiles("test")
 public class ProductTest extends AcceptanceTest{
@@ -283,6 +285,56 @@ public class ProductTest extends AcceptanceTest{
 
     }
 
+    @DisplayName("상품삭제")
+    @Test
+    public void 상품삭제 (){
+        //상품 생성1
+        ProductResponse product1 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 16 Pro", brandId,
+                "아이폰16Pro",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1600000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        Long productId1 = product1.id();
+
+        //상품 생성2
+        ProductResponse product2 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 17 Pro", brandId,
+                "아이폰17 Pro",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1600000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        //상품1 삭제
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .pathParam("productId", productId1)
+                .when()
+                .delete("seller/products/{productId}")
+                .then().log().all()
+                .statusCode(200);
+
+        List<ProductSearchResponse> responseList = getList();
+
+        assertThat(responseList.size()).isEqualTo(1);
+
+    }
+
+
     private OptionVariantRequest createVariant (String optionSummary, Integer stock, Integer extraCharge){
         return new OptionVariantRequest(optionSummary, stock, extraCharge);
     }
@@ -291,7 +343,7 @@ public class ProductTest extends AcceptanceTest{
         return new UpdateOptionVariantRequest(variantId, optionSummary, stock, extraCharge);
     }
 
-    public ProductResponse createProduct (CreateProductRequest productRequest){
+    private ProductResponse createProduct (CreateProductRequest productRequest){
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + token)
@@ -302,6 +354,18 @@ public class ProductTest extends AcceptanceTest{
                 .statusCode(200)
                 .extract()
                 .as(ProductResponse.class);
+    }
+
+    private List<ProductSearchResponse> getList (){
+        return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/products")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList(".", ProductSearchResponse.class);
     }
 
 

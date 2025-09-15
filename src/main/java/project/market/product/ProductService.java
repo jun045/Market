@@ -194,6 +194,9 @@ public class ProductService {
                 productUpdate.getUpdatedAt());
     }
 
+    //TODO 페이지네이션 추가
+    //TODO 카테고리별 보기, 브랜드별 보기, 검색으로 보기 등 옵션 추가
+    //TODO 목록에 썸네일 추가 여부
     //전체 목록 조회 (이름, 가격만)
     public List<ProductSearchResponse> findAll(){
          List<Product> products = productRepository.findAll();

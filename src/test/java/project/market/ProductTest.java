@@ -182,6 +182,74 @@ public class ProductTest extends AcceptanceTest{
 
     }
 
+    @DisplayName("상품목록조회")
+    @Test
+    public void 상품목록조회(){
+
+        ProductResponse product1 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 16 Pro", brandId,
+                "아이폰16Pro",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1600000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product2 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 17 Pro", brandId,
+                "아이폰17 Pro",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1600000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product3 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 17", brandId,
+                "아이폰17",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1400000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product4 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이패드 11", brandId,
+                "아이패드 11 air wifi",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1000000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/products")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList(".", ProductSearchResponse.class);
+
+    }
+
     @DisplayName("상품상세조회")
     @Test
     public void 상품상세조회(){

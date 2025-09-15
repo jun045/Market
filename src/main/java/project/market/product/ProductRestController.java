@@ -7,6 +7,7 @@ import project.market.member.Entity.Member;
 import project.market.product.dto.CreateProductRequest;
 import project.market.product.dto.ProductResponse;
 import project.market.product.dto.ProductSearchResponse;
+import project.market.product.dto.UpdateProductRequest;
 
 import java.util.List;
 

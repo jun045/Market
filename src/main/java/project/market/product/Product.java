@@ -6,6 +6,9 @@ import lombok.*;
 import project.market.BaseEntity;
 import project.market.Brand.Brand;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,10 +36,10 @@ public class Product extends BaseEntity {
     private String detailImage; //상세이미지
 
     @NotNull
-    private int listPrice; //정가
+    private Integer listPrice; //정가
 
-    @NotNull
-    private int salePrice; //최종가(세일가)
+//    @NotNull
+//    private int salePrice; //최종가(세일가) -> DB 저장 없이 계산으로 반환
 
 
     @NotNull
@@ -50,29 +53,36 @@ public class Product extends BaseEntity {
     private Category category;
 
     //좋아요 개수
-    private int likeCount;
+//    private int likeCount;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OptionVariant> optionVariants = new ArrayList<>();
 
     @Builder
     public Product(String productName,
+                   Brand brand,
                    String description,
                    String thumbnail,
                    String detailImage,
-                   int listPrice,
-                   int salePrice,
+                   Integer listPrice,
+//                   int salePrice,
                    ProductStatus productStatus,
                    boolean isDeleted,
                    Category category,
-                   int likeCount) {
+//                   int likeCount,
+                   List<OptionVariant> optionVariants) {
         this.productName = productName;
+        this.brand = brand;
         this.description = description;
         this.thumbnail = thumbnail;
         this.detailImage = detailImage;
         this.listPrice = listPrice;
-        this.salePrice = salePrice;
+//        this.salePrice = salePrice;
         this.productStatus = productStatus;
         this.isDeleted = isDeleted;
         this.category = category;
-        this.likeCount = likeCount;
+//        this.likeCount = likeCount;
+        this.optionVariants = optionVariants;
     }
 
     //할인된 가격 계산
@@ -94,4 +104,5 @@ public class Product extends BaseEntity {
     public void deletedProduct(){
         this.isDeleted = true;
     }
+
 }

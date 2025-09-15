@@ -88,16 +88,25 @@ public class Product extends BaseEntity {
     //할인된 가격 계산
 
     //정보 수정
-    public void update (String productName,
+    public void update (
+                   Category category,
+                   Brand brand,
+                   String productName,
                    String description,
                    String thumbnail,
                    String detailImage,
-                   int listPrice) {
-        this.productName = productName;
-        this.description = description;
-        this.thumbnail = thumbnail;
-        this.detailImage = detailImage;
-        this.listPrice = listPrice;
+                   ProductStatus productStatus,
+                   Integer listPrice
+//                   List<OptionVariant> newOptionVariants
+    ) {
+        this.category = (category != null) ? category : this.category;  //수정 값이 들어오지 않으면 기존값 유지
+        this.brand = (brand != null) ? brand : this.brand;
+        this.productName = (productName != null) ? productName : this.productName;
+        this.description = (description != null) ? description : this.description;
+        this.thumbnail = (thumbnail != null) ? thumbnail : this.thumbnail;
+        this.detailImage = (detailImage != null) ? detailImage : this.detailImage;
+        this.productStatus = (productStatus != null) ? productStatus : this.productStatus;
+        this.listPrice = (listPrice != null) ? listPrice : this.listPrice;
     }
 
     //소프트 딜리트 : 탈퇴시 true

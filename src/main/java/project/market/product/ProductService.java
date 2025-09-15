@@ -104,7 +104,7 @@ public class ProductService {
 
     //수정 - 관리자만 가능
     @Transactional
-    public ProductResponse update(Member member, CreateProductRequest request, Long id) {
+    public ProductResponse update(Member member, UpdateProductRequest request, Long id) {
 
         Member user = memberRepository.findById(member.getId()).orElseThrow(
                 () -> new IllegalArgumentException("상품 수정은 관리자만 할 수 있습니다.")
@@ -117,21 +117,81 @@ public class ProductService {
         Product productUpdate = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("상품 정보 찾을 수 없음"));
 
+        // parentsCategoryId가 null로 들어오면 기존값 유지
+        ParentCategory parents =(request.parentCategoryId() != null) ?
+
+                parentCategoryRepository.findById(request.parentCategoryId()).orElseThrow(
+                () -> new IllegalArgumentException("상위 카테고리 찾을 수 없음"))
+
+                : productUpdate.getCategory().getParentCategory();
+
+
+        // categoryId가 null로 들어오면 기존값 유지
+        Category category = (request.categoryId() != null) ?
+
+                categoryRepository.findByIdAndParentCategory(request.categoryId(), parents).orElseThrow(
+                () -> new IllegalArgumentException("카테고리 정보 찾을 수 없음"))
+
+                : productUpdate.getCategory();
+
+
+        // brandId가 null로 들어오면 기존값 유지
+        Brand brand = (request.brandId() != null ) ?
+
+                brandRepository.findById(request.brandId()).orElseThrow(
+                () -> new IllegalArgumentException("브랜드 정보 찾을 수 없음"))
+
+                : productUpdate.getBrand();
+
+        //상품 업데이트
         productUpdate.update(
+                category,
+                brand,
                 request.name(),
                 request.description(),
                 request.thumb(),
                 request.detailImage(),
+                request.productStatus(),
                 request.listPrice()
         );
 
+        //상품 옴션 수정
+        for (UpdateOptionVariantRequest variantRequest : request.updateVariantRequest()){
+            OptionVariant optionVariant = productUpdate.getOptionVariants().stream().filter(
+                    v -> v.getId().equals(variantRequest.variantId())).findFirst().orElseThrow(
+                    () -> new IllegalArgumentException("옵션 찾을 수 없음")
+            );
+
+            optionVariant.updateVariant(variantRequest.optionSummary(),
+                    variantRequest.stock(),
+                    variantRequest.extraCharge());
+        }
+
+        //상품 옵션 Response 변환
+        List<OptionVariantResponse> optionVariantResponses = productUpdate.getOptionVariants().stream().map(
+                response -> OptionVariantResponse.builder()
+                        .variantId(response.getId())
+                        .optionSummary(response.getOptionSummary())
+                        .stock(response.getStock())
+                        .extraCharge(response.getExtraCharge())
+                        .salePrice(response.getSalePrice())
+                        .build()
+        ).toList();
+
         return new ProductResponse(
                 productUpdate.getId(),
+                productUpdate.getCategory().getParentCategory().getParentCateName(),
+                productUpdate.getCategory().getCateName(),
+                productUpdate.getBrand().getBrandName(),
                 productUpdate.getProductName(),
                 productUpdate.getDescription(),
                 productUpdate.getThumbnail(),
                 productUpdate.getDetailImage(),
-                productUpdate.getListPrice());
+                productUpdate.getProductStatus(),
+                productUpdate.getListPrice(),
+                optionVariantResponses,
+                productUpdate.getCreatedAt(),
+                productUpdate.getUpdatedAt());
     }
 
     //전체 목록 조회 (이름, 가격만)

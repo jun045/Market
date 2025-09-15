@@ -27,7 +27,7 @@ public class ProductRestController {
     //상품 수정
     @PutMapping("seller/products/{productId}")
     public ProductResponse update (@AuthenticationPrincipal (expression = "member") Member member,
-                                   @RequestBody CreateProductRequest request,
+                                   @RequestBody UpdateProductRequest request,
                                    @PathVariable Long productId){
         return productService.update(member, request,productId);
     }

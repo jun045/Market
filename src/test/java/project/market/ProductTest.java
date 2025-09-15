@@ -130,6 +130,7 @@ public class ProductTest extends AcceptanceTest{
 
     }
 
+    @DisplayName("상품수정")
     @Test
     public void 상품수정(){
 
@@ -174,6 +175,39 @@ public class ProductTest extends AcceptanceTest{
                 .when()
                 .pathParam("productId", productId)
                 .put("seller/products/{productId}")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(ProductResponse.class);
+
+    }
+
+    @DisplayName("상품상세조회")
+    @Test
+    public void 상품상세조회(){
+        //상품등록
+        ProductResponse product = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰", brandId,
+                "아이폰16Pro",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1600000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        Long productId = product.id();
+
+        //상세조회
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .pathParam("productId", productId)
+                .when()
+                .get("/products/{productId}")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

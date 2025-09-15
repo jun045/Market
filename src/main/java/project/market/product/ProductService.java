@@ -206,17 +206,35 @@ public class ProductService {
     }
 
     //상세조회
-    public ProductResponse findProduct (Long id){
-        Product product = productRepository.findById(id)
+    public ProductResponse findProduct (Long productId){
+        Product product = productRepository.findById(productId)
                 .orElseThrow(()-> new IllegalArgumentException("등록된 상품이 없어 조회 불가능"));
+
+        List<OptionVariantResponse> optionVariantResponses = product.getOptionVariants().stream().map(
+                variantResponse -> OptionVariantResponse.builder()
+                        .variantId(variantResponse.getId())
+                        .optionSummary(variantResponse.getOptionSummary())
+                        .stock(variantResponse.getStock())
+                        .extraCharge(variantResponse.getExtraCharge())
+                        .salePrice(variantResponse.getSalePrice())
+                        .build()
+        ).toList();
+
 
         return new ProductResponse(
                 product.getId(),
+                product.getCategory().getParentCategory().getParentCateName(),
+                product.getCategory().getCateName(),
+                product.getBrand().getBrandName(),
                 product.getProductName(),
                 product.getDescription(),
                 product.getThumbnail(),
                 product.getDetailImage(),
-                product.getListPrice()
+                product.getProductStatus(),
+                product.getListPrice(),
+                optionVariantResponses,
+                product.getCreatedAt(),
+                product.getUpdatedAt()
         );
     }
 

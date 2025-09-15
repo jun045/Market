@@ -40,7 +40,7 @@ public class ProductRestController {
 
     //상세 조회 (가격 따로 분리?)
     @GetMapping("/products/{productId}")
-    public ProductResponse findProductDetail (Long productId){
+    public ProductResponse findProductDetail (@PathVariable Long productId){
         return productService.findProduct(productId);
     }
 

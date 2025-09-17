@@ -1,9 +1,11 @@
 package project.market.Brand;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import project.market.Brand.dto.BrandResponse;
 import project.market.Brand.dto.CreateBrandRequest;
+import project.market.member.Entity.Member;
 
 import java.util.List;
 
@@ -15,8 +17,9 @@ public class BrandController {
 
     //등록
     @PostMapping("/brands/register")
-    public BrandResponse create(@RequestBody CreateBrandRequest request) {
-        return brandService.create(request);
+    public BrandResponse create(@AuthenticationPrincipal (expression = "member") Member member,
+                                @RequestBody CreateBrandRequest request) {
+        return brandService.create(member, request);
     }
 
     //전체 조회
@@ -39,15 +42,17 @@ public class BrandController {
 
     //수정
     @PutMapping("/brands/{brandId}")
-    public BrandResponse update(@RequestBody CreateBrandRequest request,
+    public BrandResponse update(@AuthenticationPrincipal (expression = "member") Member member,
+                                @RequestBody CreateBrandRequest request,
                                 @PathVariable Long brandId) {
-        return brandService.update(request,brandId);
+        return brandService.update(member, request,brandId);
     }
 
     //삭제
     @DeleteMapping("/brands/{brandId}")
-    public void delete (@PathVariable Long brandId){
-        brandService.delete(brandId);
+    public void delete (@AuthenticationPrincipal (expression = "member") Member member,
+                        @PathVariable Long brandId){
+        brandService.delete(member, brandId);
     }
 
 }

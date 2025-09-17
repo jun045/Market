@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.market.Brand.dto.BrandResponse;
 import project.market.Brand.dto.CreateBrandRequest;
+import project.market.member.Entity.Member;
+import project.market.member.MemberRepository;
+import project.market.member.enums.Role;
 
 import java.util.List;
 
@@ -12,9 +15,19 @@ import java.util.List;
 @Service
 public class BrandService {
     private final BrandRepository brandRepository;
+    private final MemberRepository memberRepository;
 
-    //등록
-    public BrandResponse create(CreateBrandRequest request) {
+    //등록 - 관리자만 가능
+    public BrandResponse create(Member member, CreateBrandRequest request) {
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("브랜드 등록은 관리자만 할 수 있습니다.")
+        );
+
+        if (!user.getRole().equals(Role.SELLER)){
+            throw new IllegalArgumentException("브랜드 등록은 관리자만 할 수 있습니다.");
+        }
+
         Brand brand = Brand.builder()
                 .brandName(request.name())
                 .build();
@@ -59,10 +72,18 @@ public class BrandService {
     }
 
     @Transactional
-    //수정
-    public BrandResponse update(CreateBrandRequest request, Long brandId) {
+    //수정 - 관리지만 가능
+    public BrandResponse update(Member member, CreateBrandRequest request, Long brandId) {
         Brand brand = brandRepository.findById(brandId)
                 .orElseThrow(() -> new IllegalArgumentException("브랜드 찾을 수 없음"));
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("브랜드 수정은 관리자만 할 수 있습니다.")
+        );
+
+        if (!user.getRole().equals(Role.SELLER)){
+            throw new IllegalArgumentException("브랜드 수정은 관리자만 할 수 있습니다.");
+        }
 
         brand.setBrandName(request.name());
 
@@ -72,11 +93,19 @@ public class BrandService {
         );
     }
 
-    //삭제
+    //삭제 - 관리자만 가능
     @Transactional
-    public void delete(Long brandId) {
+    public void delete(Member member, Long brandId) {
         Brand brand = brandRepository.findById(brandId)
                 .orElseThrow(() -> new IllegalArgumentException("브랜드 정보 일치하지 않음"));
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("브랜드 삭제는 관리자만 할 수 있습니다.")
+        );
+
+        if (!user.getRole().equals(Role.SELLER)){
+            throw new IllegalArgumentException("브랜드 삭제는 관리자만 할 수 있습니다.");
+        }
 
         brand.deletedBrand();
     }

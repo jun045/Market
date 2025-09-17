@@ -6,6 +6,9 @@ import lombok.*;
 import project.market.BaseEntity;
 import project.market.Brand.Brand;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,10 +36,10 @@ public class Product extends BaseEntity {
     private String detailImage; //상세이미지
 
     @NotNull
-    private int listPrice; //정가
+    private Integer listPrice; //정가
 
-    @NotNull
-    private int salePrice; //최종가(세일가)
+//    @NotNull
+//    private int salePrice; //최종가(세일가) -> DB 저장 없이 계산으로 반환
 
 
     @NotNull
@@ -49,49 +52,66 @@ public class Product extends BaseEntity {
     @ManyToOne
     private Category category;
 
-    //좋아요 개수
-    private int likeCount;
+    //좋아요 개수 -> service로직에 없어서 comment 처리
+//    private int likeCount;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OptionVariant> optionVariants = new ArrayList<>();
 
     @Builder
     public Product(String productName,
+                   Brand brand,
                    String description,
                    String thumbnail,
                    String detailImage,
-                   int listPrice,
-                   int salePrice,
+                   Integer listPrice,
+//                   int salePrice,
                    ProductStatus productStatus,
                    boolean isDeleted,
                    Category category,
-                   int likeCount) {
+//                   int likeCount,
+                   List<OptionVariant> optionVariants) {
         this.productName = productName;
+        this.brand = brand;
         this.description = description;
         this.thumbnail = thumbnail;
         this.detailImage = detailImage;
         this.listPrice = listPrice;
-        this.salePrice = salePrice;
+//        this.salePrice = salePrice;
         this.productStatus = productStatus;
-        this.isDeleted = isDeleted;
+        this.isDeleted = false;
         this.category = category;
-        this.likeCount = likeCount;
+//        this.likeCount = likeCount;
+        this.optionVariants = optionVariants;
     }
 
-    //할인된 가격 계산
+
 
     //정보 수정
-    public void update (String productName,
+    public void update (
+                   Category category,
+                   Brand brand,
+                   String productName,
                    String description,
                    String thumbnail,
                    String detailImage,
-                   int listPrice) {
-        this.productName = productName;
-        this.description = description;
-        this.thumbnail = thumbnail;
-        this.detailImage = detailImage;
-        this.listPrice = listPrice;
+                   ProductStatus productStatus,
+                   Integer listPrice
+//                   List<OptionVariant> newOptionVariants
+    ) {
+        this.category = (category != null) ? category : this.category;  //수정 값이 들어오지 않으면 기존값 유지
+        this.brand = (brand != null) ? brand : this.brand;
+        this.productName = (productName != null) ? productName : this.productName;
+        this.description = (description != null) ? description : this.description;
+        this.thumbnail = (thumbnail != null) ? thumbnail : this.thumbnail;
+        this.detailImage = (detailImage != null) ? detailImage : this.detailImage;
+        this.productStatus = (productStatus != null) ? productStatus : this.productStatus;
+        this.listPrice = (listPrice != null) ? listPrice : this.listPrice;
     }
 
     //소프트 딜리트 : 탈퇴시 true
     public void deletedProduct(){
         this.isDeleted = true;
     }
+
 }

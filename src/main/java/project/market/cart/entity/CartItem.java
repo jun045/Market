@@ -47,4 +47,12 @@ public class CartItem extends BaseEntity {
     public void increaseQuantity (int newQuantity){
         this.quantity += newQuantity;
     }
+
+    public void setCartItemQuantity (int newQuantity){
+        if(newQuantity < 1){
+            throw new IllegalArgumentException("상품 수량은 1개 이상이어야 합니다");
+        }
+        this.quantity = newQuantity;
+
+    }
 }

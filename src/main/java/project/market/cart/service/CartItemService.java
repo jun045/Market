@@ -1,10 +1,12 @@
 package project.market.cart.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.market.cart.CartMapper;
 import project.market.cart.dto.CartItemResponse;
 import project.market.cart.dto.CreateCartItemRequest;
+import project.market.cart.dto.UpdateCartItemRequest;
 import project.market.cart.entity.Cart;
 import project.market.cart.entity.CartItem;
 import project.market.cart.repository.CartItemRepository;
@@ -64,6 +66,27 @@ public class CartItemService {
         //추가된 cartItem cart에 반영(편의 매서드)
         cart.addCart(cartItem);
         cartItemRepository.save(cartItem);
+
+        return CartMapper.toResponse(cartItem);
+    }
+
+    @Transactional
+    public CartItemResponse update (Member member, Long cartItemIdId, UpdateCartItemRequest request){
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("로그인이 필요합니다.")
+        );
+
+        CartItem cartItem = cartItemRepository.findById(cartItemIdId).orElseThrow(
+                () -> new IllegalArgumentException("장바구니에 등록되지 않은 상품입니다.")
+        );
+
+        if(!cartItem.getCart().getMember().getId().equals(user.getId())){
+            throw new IllegalArgumentException("자신의 장바구니에 담긴 상품만 수정할 수 있습니다.");
+        }
+
+        //장바구니 상품 수량 수정
+        cartItem.setCartItemQuantity(request.quantity());
 
         return CartMapper.toResponse(cartItem);
     }

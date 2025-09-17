@@ -12,10 +12,10 @@ import org.springframework.test.context.ActiveProfiles;
 import project.market.Brand.Brand;
 import project.market.auth.JwtProvider;
 import project.market.cart.dto.CartItemResponse;
+import project.market.cart.dto.CartResponse;
 import project.market.cart.dto.CreateCartItemRequest;
 import project.market.member.Entity.Member;
 import project.market.member.MemberRepository;
-import project.market.member.enums.MemberStatus;
 import project.market.member.enums.Role;
 import project.market.product.*;
 import project.market.product.dto.CreateProductRequest;
@@ -104,6 +104,30 @@ public class CartTest extends AcceptanceTest{
         CartItemResponse cartItemResponse = createCartItem(productId, variantId, 2);
 
         assertThat(cartItemResponse.quantity()).isEqualTo(4);
+
+    }
+
+    @DisplayName("장바구니 조회")
+    @Test
+    public void 장바구니조회(){
+        ProductResponse product = createProduct();
+        Long productId = product.id();
+        Long variantId = product.variantResponseList().get(0).variantId();
+        Long variantId2 = product.variantResponseList().get(3).variantId();
+
+        createCartItem(productId, variantId, 2);
+        createCartItem(productId, variantId2, 3);
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .when()
+                .get("api/v1/me/cart")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CartResponse.class);
+
 
     }
 

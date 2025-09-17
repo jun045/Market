@@ -29,4 +29,14 @@ public class CartItemController {
 
         return cartItemService.update(member, cartItemId, request);
     }
+
+    //장바구니 아이템 삭제
+    @DeleteMapping("api/v1/me/cart/items/{cartItemId}")
+    public ResponseEntity<Void> deleteCartItem (@AuthenticationPrincipal (expression = "member") Member member,
+                                                @PathVariable Long cartItemId){
+
+        cartItemService.delete(member, cartItemId);
+
+        return ResponseEntity.ok().build();
+    }
 }

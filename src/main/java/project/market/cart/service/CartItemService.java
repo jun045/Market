@@ -91,4 +91,23 @@ public class CartItemService {
         return CartMapper.toResponse(cartItem);
     }
 
+    //장바구니 아이템 삭제
+    @Transactional
+    public void delete(Member member, Long cartItemId){
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("로그인이 필요합니다.")
+        );
+
+        CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow(
+                () -> new IllegalArgumentException("장바구니에 등록되지 않은 상품입니다.")
+        );
+
+        if(!cartItem.getCart().getMember().getId().equals(user.getId())){
+            throw new IllegalArgumentException("자신의 장바구니에 담긴 상품만 삭제할 수 있습니다.");
+        }
+
+        cartItemRepository.delete(cartItem);
+    }
+
 }

@@ -14,6 +14,7 @@ import project.market.auth.JwtProvider;
 import project.market.cart.dto.CartItemResponse;
 import project.market.cart.dto.CartResponse;
 import project.market.cart.dto.CreateCartItemRequest;
+import project.market.cart.dto.UpdateCartItemRequest;
 import project.market.member.Entity.Member;
 import project.market.member.MemberRepository;
 import project.market.member.enums.Role;
@@ -127,7 +128,32 @@ public class CartTest extends AcceptanceTest{
                 .statusCode(200)
                 .extract()
                 .as(CartResponse.class);
+    }
 
+    @DisplayName("장바구니 아이템 수정")
+    @Test
+    public void 장바구니수정 (){
+        ProductResponse product = createProduct();
+        Long productId = product.id();
+        Long variantId = product.variantResponseList().get(0).variantId();
+
+        CartItemResponse cartItemResponse = createCartItem(productId, variantId, 2);
+
+        Long cartItemId = cartItemResponse.id();
+
+        CartItemResponse updatedResponse = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .pathParam("cartItemId", cartItemId)
+                .body(new UpdateCartItemRequest(1))
+                .when()
+                .patch("api/v1/me/cart/items/{cartItemId}")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CartItemResponse.class);
+
+        assertThat(updatedResponse.quantity()).isEqualTo(1);
 
     }
 

@@ -157,6 +157,39 @@ public class CartTest extends AcceptanceTest{
 
     }
 
+    @DisplayName("장바구니 아이템 삭제")
+    @Test
+    public void 장바구니아이템삭제 (){
+
+        //제품생성
+        ProductResponse product = createProduct();
+        Long productId = product.id();
+        Long variantId = product.variantResponseList().get(0).variantId();
+        Long variantId2 = product.variantResponseList().get(3).variantId();
+
+        //장바구니 아이템 생성
+        CartItemResponse cartItemResponse = createCartItem(productId, variantId, 2);
+        createCartItem(productId, variantId2, 3);
+
+        Long cartItemId = cartItemResponse.id();
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .pathParam("cartItemId", cartItemId)
+                .when()
+                .delete("api/v1/me/cart/items/{cartItemId}")
+                .then().log().all()
+                .statusCode(200);
+
+        //장바구니 조회
+        CartResponse cart = getCart();
+
+        assertThat(cart.cartItemResponses().size()).isEqualTo(1);
+
+    }
+
+    //제품생성 메서드
     public ProductResponse createProduct (){
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -201,6 +234,17 @@ public class CartTest extends AcceptanceTest{
                 .as(CartItemResponse.class);
     }
 
-
+    //장바구니 조회 메서드
+    private CartResponse getCart (){
+        return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .when()
+                .get("api/v1/me/cart")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CartResponse.class);
+    }
 
 }

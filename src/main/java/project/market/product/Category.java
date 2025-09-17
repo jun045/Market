@@ -21,8 +21,7 @@ public class Category extends BaseEntity {
     private ParentCategory parentCategory; //하위 카테고리 (ex. 긴소매,반소매 등)
 
     @Builder
-    public Category(Long id, String cateName, ParentCategory parentCategory) {
-        this.id = id;
+    public Category(String cateName, ParentCategory parentCategory) {
         this.cateName = cateName;
         this.parentCategory = parentCategory;
     }

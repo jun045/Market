@@ -1,7 +1,6 @@
 package project.market.product;
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -33,8 +32,7 @@ public class OptionVariant extends BaseEntity {
     private Product product;
 
     @Builder
-    public OptionVariant(Long id, String optionSummary, Integer stock, Integer extraCharge, Integer salePrice, Product product) {
-        this.id = id;
+    public OptionVariant(String optionSummary, Integer stock, Integer extraCharge, Integer salePrice, Product product) {
         this.optionSummary = optionSummary;
         this.stock = stock;
         this.extraCharge = extraCharge;

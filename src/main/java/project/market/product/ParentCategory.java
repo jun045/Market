@@ -20,8 +20,7 @@ public class ParentCategory {
     private String parentCateName; //상위 카테고리명 (ex. 상의,하의)
 
     @Builder
-    public ParentCategory(Long id, String parentCateName) {
-        this.id = id;
+    public ParentCategory(String parentCateName) {
         this.parentCateName = parentCateName;
     }
 }

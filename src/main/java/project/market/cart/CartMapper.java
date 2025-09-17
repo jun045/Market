@@ -48,10 +48,12 @@ public class CartMapper {
                                 .build())
                         .toList();
 
+        //장바구니 상품 총 금액 계산
         int totalPrice = cartItemResponses.stream().mapToInt(
                 CartItemResponse::itemPrice
         ).sum();
 
+        //장바구니 상품 총 수량 계산
         int totalQuantity = cartItemResponses.stream().mapToInt(
                 CartItemResponse::quantity
         ).sum();

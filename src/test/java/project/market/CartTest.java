@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import project.market.Brand.Brand;
 import project.market.auth.JwtProvider;
@@ -16,7 +15,6 @@ import project.market.cart.dto.CartResponse;
 import project.market.cart.dto.CreateCartItemRequest;
 import project.market.cart.dto.UpdateCartItemRequest;
 import project.market.member.Entity.Member;
-import project.market.member.MemberRepository;
 import project.market.member.enums.Role;
 import project.market.product.*;
 import project.market.product.dto.CreateProductRequest;
@@ -34,40 +32,33 @@ public class CartTest extends AcceptanceTest{
     @Autowired DatabaseCleanup databaseCleanup;
     @Autowired DataSeeder dataSeeder;
     @Autowired JwtProvider jwtProvider;
-    @Autowired ProductRepository productRepository;
-    @Autowired PasswordEncoder passwordEncoder;
-    @Autowired MemberRepository memberRepository;
 
     private String userToken;
     private String adminToken;
     private Long parentCategoryId;
     private Long categoryId;
     private Long brandId;
-    private Long productId1;
-    private Long optionVariantId1;
-    private Long optionVariantId2;
-    private Long optionVariantId3;
-    private Long optionVariantId4;
 
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
         databaseCleanup.execute();
 
-
+        //유저 생성
         Member member1 = dataSeeder.createMember();
+        //관리자 생성
         Member admin1 = dataSeeder.createAdmin();
 
         userToken = jwtProvider.createToken(member1.getId(), Role.BUYER);
         adminToken = jwtProvider.createToken(admin1.getId(), Role.SELLER);
 
+        //카테고리 생성
         Category category = dataSeeder.createCategory();
         categoryId = category.getId();
         parentCategoryId = category.getParentCategory().getId();
 
+        //브랜드 생성
         Brand brand = dataSeeder.createBrand();
-
-        categoryId = category.getId();
         brandId = brand.getId();
 
     }
@@ -76,6 +67,7 @@ public class CartTest extends AcceptanceTest{
     @Test
     public void 장바구니아이템생성 (){
 
+        //제품 생성
         ProductResponse product = createProduct();
         Long productId = product.id();
         Long variantId = product.variantResponseList().get(0).variantId();
@@ -90,18 +82,19 @@ public class CartTest extends AcceptanceTest{
                 .statusCode(200)
                 .extract()
                 .as(CartItemResponse.class);
-
     }
 
     @DisplayName("장바구니 아이템 중복 생성")
     @Test
     public void 중복생성 (){
+
+        //제품 생성
         ProductResponse product = createProduct();
         Long productId = product.id();
         Long variantId = product.variantResponseList().get(0).variantId();
 
+        //장바구니 아이템 중복 생성
         createCartItem(productId, variantId, 2);
-
         CartItemResponse cartItemResponse = createCartItem(productId, variantId, 2);
 
         assertThat(cartItemResponse.quantity()).isEqualTo(4);
@@ -111,11 +104,14 @@ public class CartTest extends AcceptanceTest{
     @DisplayName("장바구니 조회")
     @Test
     public void 장바구니조회(){
+
+        //제품생성
         ProductResponse product = createProduct();
         Long productId = product.id();
         Long variantId = product.variantResponseList().get(0).variantId();
         Long variantId2 = product.variantResponseList().get(3).variantId();
 
+        //장바구니 아이템 생성
         createCartItem(productId, variantId, 2);
         createCartItem(productId, variantId2, 3);
 
@@ -133,12 +129,14 @@ public class CartTest extends AcceptanceTest{
     @DisplayName("장바구니 아이템 수정")
     @Test
     public void 장바구니수정 (){
+
+        //제품생성
         ProductResponse product = createProduct();
         Long productId = product.id();
         Long variantId = product.variantResponseList().get(0).variantId();
 
+        //장바구니 아이템 생성
         CartItemResponse cartItemResponse = createCartItem(productId, variantId, 2);
-
         Long cartItemId = cartItemResponse.id();
 
         CartItemResponse updatedResponse = RestAssured.given().log().all()
@@ -217,10 +215,12 @@ public class CartTest extends AcceptanceTest{
 
     }
 
+    //옵션 생성 메서드
     private OptionVariantRequest createVariant (String optionSummary, Integer stock, Integer extraCharge){
         return new OptionVariantRequest(optionSummary, stock, extraCharge);
     }
 
+    //장바구니 생성 메서드
     private CartItemResponse createCartItem (Long productId, Long variantId, int quantity){
         return   RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

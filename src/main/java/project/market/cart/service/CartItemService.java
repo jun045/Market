@@ -28,6 +28,7 @@ public class CartItemService {
     private final OptionVariantRepository optionVariantRepository;
     private final MemberRepository memberRepository;
 
+    //장바구니 아이템 생성
     public CartItemResponse create (Member member, CreateCartItemRequest request){
 
         Member user = memberRepository.findById(member.getId()).orElseThrow(
@@ -43,7 +44,7 @@ public class CartItemService {
                 () -> new IllegalArgumentException("존재하지 않는 상품입니다.")
         );
 
-        //이미 장바구니에 넣은 상품과 옵션을 다시 넣으면
+        //이미 장바구니에 넣은 상품과 옵션을 중복으로 넣으면
         //장바구니에 또 상품을 추가하지 않고 기존에 넣어둔 상품과 옵션의 수량만 증가시킴
         CartItem existingItem = cartItemRepository.findByCartIdAndOptionVariantId(cart.getId(), request.optionVariantId()).orElse(null);
 
@@ -70,6 +71,7 @@ public class CartItemService {
         return CartMapper.toResponse(cartItem);
     }
 
+    //장바구니 아이템 수정(수량 변경)
     @Transactional
     public CartItemResponse update (Member member, Long cartItemIdId, UpdateCartItemRequest request){
 

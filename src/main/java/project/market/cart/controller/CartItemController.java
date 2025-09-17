@@ -1,6 +1,7 @@
 package project.market.cart.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import project.market.cart.dto.CartItemResponse;
@@ -15,6 +16,7 @@ public class CartItemController {
 
     private final CartItemService cartItemService;
 
+    //장바구니 아이템 생성
     @PostMapping("api/v1/me/cart/items")
     public CartItemResponse createCartItem (@AuthenticationPrincipal (expression = "member") Member member,
                                             @RequestBody CreateCartItemRequest request){
@@ -22,6 +24,7 @@ public class CartItemController {
         return cartItemService.create(member, request);
     }
 
+    //장바구니 아이템 수정(수량 변경)
     @PatchMapping("api/v1/me/cart/items/{cartItemId}")
     public CartItemResponse updateCartItem (@AuthenticationPrincipal (expression = "member") Member member,
                                             @PathVariable Long cartItemId,

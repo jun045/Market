@@ -47,7 +47,7 @@ public class OptionVariant extends BaseEntity {
 
     //salePrice 계산
     @Transient
-    public Integer getSalePrice(){
+    public int getSalePrice(){
         return this.product.getListPrice() + this.extraCharge;
     }
 

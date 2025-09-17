@@ -1,9 +1,13 @@
 package project.market.cart;
 
 import project.market.cart.dto.CartItemResponse;
+import project.market.cart.dto.CartResponse;
+import project.market.cart.entity.Cart;
 import project.market.cart.entity.CartItem;
 
-public class CartItemMapper {
+import java.util.List;
+
+public class CartMapper {
 
     public static CartItemResponse toResponse (CartItem cartItem){
 

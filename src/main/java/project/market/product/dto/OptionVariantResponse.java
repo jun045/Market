@@ -7,5 +7,5 @@ public record OptionVariantResponse(Long variantId,
                                     String optionSummary,
                                     Integer stock,
                                     Integer extraCharge,
-                                    Integer salePrice) {
+                                    int salePrice) {
 }

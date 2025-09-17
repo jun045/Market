@@ -2,7 +2,7 @@ package project.market.cart.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import project.market.cart.CartItemMapper;
+import project.market.cart.CartMapper;
 import project.market.cart.dto.CartItemResponse;
 import project.market.cart.dto.CreateCartItemRequest;
 import project.market.cart.entity.Cart;
@@ -32,17 +32,26 @@ public class CartItemService {
                 () -> new IllegalArgumentException("로그인이 필요합니다.")
         );
 
+        //Cart가 없다면 최초 생성
+        Cart cart = cartRepository.findByMemberId(user.getId()).orElseGet(
+                () -> cartRepository.save(Cart.createCart(user))
+        );
+
         Product product = productRepository.findById(request.productId()).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 상품입니다.")
         );
 
+        //이미 장바구니에 넣은 상품과 옵션을 다시 넣으면
+        //장바구니에 또 상품을 추가하지 않고 기존에 넣어둔 상품과 옵션의 수량만 증가시킴
+        CartItem existingItem = cartItemRepository.findByCartIdAndOptionVariantId(cart.getId(), request.optionVariantId()).orElse(null);
+
+        if(existingItem != null){
+            existingItem.increaseQuantity(request.quantity());
+            return CartMapper.toResponse(existingItem);
+        }
+
         OptionVariant optionVariant = optionVariantRepository.findById(request.optionVariantId()).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 옵션입니다.")
-        );
-
-        //Cart가 없다면 최초 생성
-        Cart cart = cartRepository.findByMemberId(user.getId()).orElseGet(
-                () -> cartRepository.save(Cart.createCart(user))
         );
 
         CartItem cartItem = CartItem.builder()
@@ -56,7 +65,7 @@ public class CartItemService {
         cart.addCart(cartItem);
         cartItemRepository.save(cartItem);
 
-        return CartItemMapper.toResponse(cartItem);
+        return CartMapper.toResponse(cartItem);
     }
 
 }

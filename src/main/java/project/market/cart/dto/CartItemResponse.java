@@ -11,9 +11,9 @@ public record CartItemResponse(Long id,
                                String thumb,
                                Long optionVariantId,
                                String optionSummary,
-                               Integer quantity,
-                               Integer salePrice,
-                               Integer itemPrice,
+                               int quantity,
+                               int salePrice,
+                               int itemPrice,
                                LocalDateTime createdAt,
                                LocalDateTime updatedAt) {
 }

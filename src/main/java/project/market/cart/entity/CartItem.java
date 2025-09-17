@@ -29,10 +29,10 @@ public class CartItem extends BaseEntity {
     private OptionVariant optionVariant;
 
     @NotNull
-    private Integer quantity;
+    private int quantity;
 
     @Builder
-    public CartItem(Cart cart, Product product, Integer quantity, OptionVariant optionVariant) {
+    public CartItem(Cart cart, Product product, int quantity, OptionVariant optionVariant) {
         this.cart = cart;
         this.product = product;
         this.quantity = quantity;
@@ -41,5 +41,10 @@ public class CartItem extends BaseEntity {
 
     public void setCart(Cart cart) {
         this.cart = cart;
+    }
+
+    //장바구니 상품 수량 증가
+    public void increaseQuantity (int newQuantity){
+        this.quantity += newQuantity;
     }
 }

@@ -21,9 +21,8 @@ import project.market.product.*;
 import project.market.product.dto.CreateProductRequest;
 import project.market.product.dto.OptionVariantRequest;
 import project.market.product.dto.ProductResponse;
-
-
 import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 public class CartTest extends AcceptanceTest{
@@ -93,6 +92,21 @@ public class CartTest extends AcceptanceTest{
 
     }
 
+    @DisplayName("장바구니 아이템 중복 생성")
+    @Test
+    public void 중복생성 (){
+        ProductResponse product = createProduct();
+        Long productId = product.id();
+        Long variantId = product.variantResponseList().get(0).variantId();
+
+        createCartItem(productId, variantId, 2);
+
+        CartItemResponse cartItemResponse = createCartItem(productId, variantId, 2);
+
+        assertThat(cartItemResponse.quantity()).isEqualTo(4);
+
+    }
+
     public ProductResponse createProduct (){
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -123,5 +137,20 @@ public class CartTest extends AcceptanceTest{
     private OptionVariantRequest createVariant (String optionSummary, Integer stock, Integer extraCharge){
         return new OptionVariantRequest(optionSummary, stock, extraCharge);
     }
+
+    private CartItemResponse createCartItem (Long productId, Long variantId, int quantity){
+        return   RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .body(new CreateCartItemRequest(productId, variantId, quantity))
+                .when()
+                .post("api/v1/me/cart/items")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CartItemResponse.class);
+    }
+
+
 
 }

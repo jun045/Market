@@ -25,6 +25,8 @@ import project.market.review.dto.UpdateReviewRequest;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @ActiveProfiles("test")
 public class ReviewTest extends AcceptanceTest{
 
@@ -158,6 +160,43 @@ public class ReviewTest extends AcceptanceTest{
                 .as(ReviewResponse.class);
     }
 
+    @DisplayName("리뷰 삭제 테스트")
+    @Test
+    public void 리뷰삭제 (){
+
+        //제품생성
+        ProductResponse productResponse = createProduct();
+        Long productId = productResponse.id();
+        Long variantId1 = productResponse.variantResponseList().get(0).variantId();
+
+        //장바구니 아이템 생성
+        createCartItem(userToken, productId, variantId1, 3);
+        createCartItem(userToken2, productId, variantId1, 2);
+        createCartItem(userToken3, productId, variantId1, 1);
+
+        //리뷰생성
+        ReviewResponse reviewResponse = createReview(userToken, productId, new ReviewRequest(5, "리뷰내용1"));
+        createReview(userToken2, productId, new ReviewRequest(4, "리뷰내용2"));
+        createReview(userToken3, productId, new ReviewRequest(3, "리뷰내용3"));
+        Long reviewId = reviewResponse.id();
+
+        //리뷰삭제
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .pathParam("reviewId", reviewId)
+                .when()
+                .delete("api/v1/products/review/{reviewId}")
+                .then().log().all()
+                .statusCode(200);
+
+        //리뷰조회
+        List<ReviewResponse> reviews = getReviews(productId);
+
+        assertThat(reviews.size()).isEqualTo(2);
+
+    }
+
 
 
 
@@ -221,6 +260,20 @@ public class ReviewTest extends AcceptanceTest{
                 .statusCode(200)
                 .extract()
                 .as(ReviewResponse.class);
+    }
+
+    //리뷰 목록 조회 매서드
+    private List<ReviewResponse> getReviews (Long productId){
+        return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("productId", productId)
+                .when()
+                .get("api/v1/products/{productId}/review")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList(".", ReviewResponse.class);
     }
 
 }

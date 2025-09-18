@@ -153,7 +153,7 @@ public class ReviewTest extends AcceptanceTest{
                 .pathParam("reviewId", reviewId)
                 .body(new UpdateReviewRequest(4, null))
                 .when()
-                .patch("api/v1/products/review/{reviewId}")
+                .patch("api/v1/products/reviews/{reviewId}")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -186,7 +186,7 @@ public class ReviewTest extends AcceptanceTest{
                 .header("Authorization", "Bearer " + userToken)
                 .pathParam("reviewId", reviewId)
                 .when()
-                .delete("api/v1/products/review/{reviewId}")
+                .delete("api/v1/products/reviews/{reviewId}")
                 .then().log().all()
                 .statusCode(200);
 
@@ -195,6 +195,40 @@ public class ReviewTest extends AcceptanceTest{
 
         assertThat(reviews.size()).isEqualTo(2);
 
+    }
+
+    @DisplayName("관리자권한 리뷰 삭제 테스트")
+    @Test
+    public void 관리자삭제 (){
+
+        //제품생성
+        ProductResponse productResponse = createProduct();
+        Long productId = productResponse.id();
+        Long variantId1 = productResponse.variantResponseList().get(0).variantId();
+
+        //장바구니 아이템 생성
+        createCartItem(userToken, productId, variantId1, 3);
+        createCartItem(userToken2, productId, variantId1, 2);
+        createCartItem(userToken3, productId, variantId1, 1);
+
+        //리뷰생성
+        ReviewResponse reviewResponse = createReview(userToken, productId, new ReviewRequest(5, "리뷰내용1"));
+        createReview(userToken2, productId, new ReviewRequest(4, "리뷰내용2"));
+        createReview(userToken3, productId, new ReviewRequest(3, "리뷰내용3"));
+        Long reviewId = reviewResponse.id();
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
+                .pathParam("reviewId", reviewId)
+                .when()
+                .delete("api/v1/seller/products/reviews/{reviewId}")
+                .then().log().all()
+                .statusCode(200);
+
+        List<ReviewResponse> reviews = getReviews(productId);
+
+        assertThat(reviews.size()).isEqualTo(2);
     }
 
 

@@ -1,9 +1,11 @@
 package project.market.review;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.function.EntityResponse;
 import project.market.member.Entity.Member;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
@@ -40,5 +42,14 @@ public class ReviewController {
                                         @RequestBody UpdateReviewRequest request){
 
         return reviewService.update(member, reviewId, request);
+    }
+
+    @DeleteMapping("api/v1/products/review/{reviewId}")
+    public ResponseEntity<Void> deleteReview (@AuthenticationPrincipal (expression = "member") Member member,
+                                              @PathVariable Long reviewId){
+
+        reviewService.delete(member, reviewId);
+
+        return ResponseEntity.ok().build();
     }
 }

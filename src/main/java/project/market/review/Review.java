@@ -37,7 +37,7 @@ public class Review extends BaseEntity {
     @NotNull
     private String content;
 
-    private Boolean isDeleted;
+    private Boolean isDeleted = false;
 
     @Builder
     public Review(Member member, Product product, CartItem cartItem, int rating, String content, Boolean isDeleted) {
@@ -46,12 +46,16 @@ public class Review extends BaseEntity {
         this.cartItem = cartItem;
         this.rating = rating;
         this.content = content;
-        this.isDeleted = isDeleted;
+        this.isDeleted = false;
     }
 
     //리뷰 수정 매서드
     public void update(Integer rating, String content) {
         this.rating = (rating != null) ? rating : this.rating;
         this.content = (content != null) ? content : this.content;
+    }
+
+    public void softDelete (){
+        this.isDeleted = true;
     }
 }

@@ -59,7 +59,7 @@ public class ReviewService {
     //리뷰 목록 조회
     public List<ReviewResponse> getAll (Long productId){
 
-        List<Review> reviews = reviewRepository.findAllByProductId(productId);
+        List<Review> reviews = reviewRepository.findAllByProductIdAndIsDeletedFalse(productId);
 
         return reviews.stream().map(
                         ReviewMapper::toResponse)
@@ -87,6 +87,25 @@ public class ReviewService {
         review.update(request.rating(), review.getContent());
 
         return ReviewMapper.toResponse(review);
+
+    }
+
+    @Transactional
+    public void delete (Member member, Long reviewId){
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("리뷰 삭제는 로그인 후 가능합니다")
+        );
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new IllegalArgumentException("리뷰가 존재하지 않습니다.")
+        );
+
+        if(!user.getId().equals(review.getMember().getId())){
+            throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
+        }
+
+        review.softDelete();
 
     }
 }

@@ -33,7 +33,7 @@ public class ReviewService {
         );
 
         //TODO order 도메인 구현 후 order에서 가져와야 함
-        CartItem cartItem = cartItemRepository.findByProductId(productId).orElseThrow(
+        CartItem cartItem = cartItemRepository.findByCartMemberIdAndProductId(user.getId(), product.getId()).orElseThrow(
                 () -> new IllegalArgumentException("구매한 상품만 리뷰를 작성할 수 있습니다.")
         );
 

@@ -12,6 +12,8 @@ import project.market.product.ProductRepository;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class ReviewService {
@@ -22,6 +24,7 @@ public class ReviewService {
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
 
+    //리뷰 생성
     public ReviewResponse create (Member member, Long productId, ReviewRequest request){
 
         Member user = memberRepository.findById(member.getId()).orElseThrow(
@@ -37,9 +40,6 @@ public class ReviewService {
                 () -> new IllegalArgumentException("구매한 상품만 리뷰를 작성할 수 있습니다.")
         );
 
-        cartItem.getOptionVariant().getOptionSummary();
-
-
         Review review = Review.builder()
                 .member(user)
                 .product(product)
@@ -53,4 +53,17 @@ public class ReviewService {
         return ReviewMapper.toResponse(review);
 
     }
+
+    //리뷰 목록 조회
+    public List<ReviewResponse> getAll (Long productId){
+
+        List<Review> reviews = reviewRepository.findAllByProductId(productId);
+
+        return reviews.stream().map(
+                        ReviewMapper::toResponse)
+                .toList();
+
+    }
+
+
 }

@@ -36,7 +36,7 @@ public class ReviewController {
     }
 
     //리뷰 수정
-    @PatchMapping("api/v1/products/review/{reviewId}")
+    @PatchMapping("api/v1/products/reviews/{reviewId}")
     public ReviewResponse updateReview (@AuthenticationPrincipal (expression = "member") Member member,
                                         @PathVariable Long reviewId,
                                         @RequestBody UpdateReviewRequest request){
@@ -44,11 +44,21 @@ public class ReviewController {
         return reviewService.update(member, reviewId, request);
     }
 
-    @DeleteMapping("api/v1/products/review/{reviewId}")
+    //리뷰 삭제
+    @DeleteMapping("api/v1/products/reviews/{reviewId}")
     public ResponseEntity<Void> deleteReview (@AuthenticationPrincipal (expression = "member") Member member,
                                               @PathVariable Long reviewId){
 
         reviewService.delete(member, reviewId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("api/v1/seller/products/reviews/{reviewId}")
+    public ResponseEntity<Void> deleteForSeller (@AuthenticationPrincipal (expression = "member") Member member,
+                                                 @PathVariable Long reviewId){
+
+        reviewService.sellerDelete(member, reviewId);
 
         return ResponseEntity.ok().build();
     }

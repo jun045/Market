@@ -8,6 +8,7 @@ import project.market.cart.repository.CartItemRepository;
 import project.market.cart.repository.CartRepository;
 import project.market.member.Entity.Member;
 import project.market.member.MemberRepository;
+import project.market.member.enums.Role;
 import project.market.product.Product;
 import project.market.product.ProductRepository;
 import project.market.review.dto.ReviewRequest;
@@ -90,11 +91,12 @@ public class ReviewService {
 
     }
 
+    //리뷰 삭제
     @Transactional
     public void delete (Member member, Long reviewId){
 
         Member user = memberRepository.findById(member.getId()).orElseThrow(
-                () -> new IllegalArgumentException("리뷰 삭제는 로그인 후 가능합니다")
+                () -> new IllegalArgumentException("리뷰 삭제는 로그인 후 가능합니다.")
         );
 
         Review review = reviewRepository.findById(reviewId).orElseThrow(
@@ -107,5 +109,23 @@ public class ReviewService {
 
         review.softDelete();
 
+    }
+
+    @Transactional
+    public void sellerDelete(Member member, Long reviewId) {
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("리뷰 삭제는 로그인 후 가능합니다.")
+        );
+
+        if(!user.getRole().equals(Role.SELLER)){
+            throw new IllegalArgumentException("관리자 모드입니다. 관리자만 삭제 가능합니다.");
+        }
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new IllegalArgumentException("리뷰가 존재하지 않습니다.")
+        );
+
+        review.softDelete();
     }
 }

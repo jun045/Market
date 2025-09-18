@@ -21,6 +21,7 @@ import project.market.product.dto.OptionVariantRequest;
 import project.market.product.dto.ProductResponse;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
+import project.market.review.dto.UpdateReviewRequest;
 
 import java.util.List;
 
@@ -129,10 +130,39 @@ public class ReviewTest extends AcceptanceTest{
                 .getList(".", ReviewResponse.class);
     }
 
+    @DisplayName("리뷰 수정 테스트")
+    @Test
+    public void 리뷰수정 (){
+        //제품생성
+        ProductResponse productResponse = createProduct();
+        Long productId = productResponse.id();
+        Long variantId1 = productResponse.variantResponseList().get(0).variantId();
+
+        //장바구니 아이템 생성
+        createCartItem(userToken, productId, variantId1, 3);
+
+        //리뷰생성
+        ReviewResponse reviewResponse = createReview(userToken, productId, new ReviewRequest(5, "리뷰내용1"));
+        Long reviewId = reviewResponse.id();
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .pathParam("reviewId", reviewId)
+                .body(new UpdateReviewRequest(4, null))
+                .when()
+                .patch("api/v1/products/review/{reviewId}")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(ReviewResponse.class);
+    }
+
+
 
 
     //제품생성 메서드
-    public ProductResponse createProduct (){
+    private ProductResponse createProduct (){
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + adminToken)

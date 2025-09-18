@@ -45,6 +45,41 @@ public class DataSeeder {
         return memberRepository.save(user1);
     }
 
+    public Member createMember2 (){
+        Member user2 = new Member(
+                "userId2",
+                "aAbB1234567890!",
+                "유저2",
+                "닉네임2",
+                "email2@exampl.com",
+                Role.BUYER,
+                MemberStatus.ACTIVE,
+                Level.BRONZE,
+                0,
+                false,
+                null);
+
+        return memberRepository.save(user2);
+    }
+
+    public Member createMember3 (){
+        Member user3 = new Member(
+                "userId3",
+                "aAbB1234567890!",
+                "유저3",
+                "닉네임3",
+                "email3@exampl.com",
+                Role.BUYER,
+                MemberStatus.ACTIVE,
+                Level.BRONZE,
+                0,
+                false,
+                null);
+
+        return memberRepository.save(user3);
+    }
+
+
     public Member createAdmin (){
         Member admin1 = new Member(
                 "adminId",

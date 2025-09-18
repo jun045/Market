@@ -2,10 +2,12 @@ package project.market.review;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import project.market.member.Entity.Member;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
+import project.market.review.dto.UpdateReviewRequest;
 
 import java.util.List;
 
@@ -29,5 +31,14 @@ public class ReviewController {
     public List<ReviewResponse> getAllReviews (@PathVariable Long productId){
 
         return reviewService.getAll(productId);
+    }
+
+    //리뷰 수정
+    @PatchMapping("api/v1/products/review/{reviewId}")
+    public ReviewResponse updateReview (@AuthenticationPrincipal (expression = "member") Member member,
+                                        @PathVariable Long reviewId,
+                                        @RequestBody UpdateReviewRequest request){
+
+        return reviewService.update(member, reviewId, request);
     }
 }

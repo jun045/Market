@@ -1,5 +1,6 @@
 package project.market.review;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.market.cart.entity.CartItem;
@@ -11,6 +12,7 @@ import project.market.product.Product;
 import project.market.product.ProductRepository;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
+import project.market.review.dto.UpdateReviewRequest;
 
 import java.util.List;
 
@@ -65,5 +67,26 @@ public class ReviewService {
 
     }
 
+    //리뷰 수정
+    @Transactional
+    public ReviewResponse update(Member member, Long reviewId, UpdateReviewRequest request) {
 
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("리뷰 수정은 로그인 후 가능합니다")
+        );
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new IllegalArgumentException("리뷰가 존재하지 않습니다.")
+        );
+
+        if(!user.getId().equals(review.getMember().getId())){
+            throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
+        }
+
+        //리뷰 수정
+        review.update(request.rating(), review.getContent());
+
+        return ReviewMapper.toResponse(review);
+
+    }
 }

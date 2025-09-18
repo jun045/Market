@@ -48,4 +48,10 @@ public class Review extends BaseEntity {
         this.content = content;
         this.isDeleted = isDeleted;
     }
+
+    //리뷰 수정 매서드
+    public void update(Integer rating, String content) {
+        this.rating = (rating != null) ? rating : this.rating;
+        this.content = (content != null) ? content : this.content;
+    }
 }

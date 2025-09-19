@@ -65,7 +65,7 @@ public class CartItemService {
                 .build();
 
         //추가된 cartItem cart에 반영(편의 매서드)
-        cart.addCart(cartItem);
+        cart.addCartItem(cartItem);
         cartItemRepository.save(cartItem);
 
         return CartMapper.toResponse(cartItem);
@@ -109,6 +109,8 @@ public class CartItemService {
             throw new IllegalArgumentException("자신의 장바구니에 담긴 상품만 삭제할 수 있습니다.");
         }
 
+        //양방향 편의 매서드
+        cartItem.getCart().removeCart(cartItem);
         cartItemRepository.delete(cartItem);
     }
 

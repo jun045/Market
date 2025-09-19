@@ -39,8 +39,13 @@ public class Cart extends BaseEntity {
     }
 
     //담은 cartItem을 Cart에 바로 반영할 수 있는 편의 매서드
-    public void addCart (CartItem cartItem){
-        cartItems.add(cartItem);
-        cartItem.setCart(this);
+    public void addCartItem (CartItem item){
+        cartItems.add(item);
+        item.setCart(this);
+    }
+
+    public void removeCart(CartItem item){
+        cartItems.remove(item);
+        item.setCart(this);
     }
 }

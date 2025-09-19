@@ -1,5 +1,16 @@
 package project.market.review.dto;
 
-public record ReviewRequest(Integer rating,
-                            String content) {
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+public record ReviewRequest(
+        @NotNull
+        @Min(value = 1)
+        @Max(value = 5)
+        Integer rating,
+        @NotNull
+        @Size(max = 300)
+        String content) {
 }

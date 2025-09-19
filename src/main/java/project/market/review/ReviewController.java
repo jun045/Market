@@ -1,5 +1,6 @@
 package project.market.review;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,7 +24,7 @@ public class ReviewController {
     @PostMapping("api/v1/products/{productId}/review")
     public ReviewResponse createReview (@AuthenticationPrincipal (expression = "member") Member member,
                                         @PathVariable Long productId,
-                                        @RequestBody ReviewRequest request){
+                                        @Valid @RequestBody ReviewRequest request){
 
         return reviewService.create(member, productId, request);
     }
@@ -39,7 +40,7 @@ public class ReviewController {
     @PatchMapping("api/v1/products/reviews/{reviewId}")
     public ReviewResponse updateReview (@AuthenticationPrincipal (expression = "member") Member member,
                                         @PathVariable Long reviewId,
-                                        @RequestBody UpdateReviewRequest request){
+                                        @Valid @RequestBody UpdateReviewRequest request){
 
         return reviewService.update(member, reviewId, request);
     }

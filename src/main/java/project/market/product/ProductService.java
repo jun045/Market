@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.market.Brand.Brand;
 import project.market.Brand.BrandRepository;
+import project.market.PageInfo;
 import project.market.member.Entity.Member;
 import project.market.member.MemberRepository;
 import project.market.member.enums.Role;
@@ -224,9 +225,9 @@ public class ProductService {
                 )).toList();
 
         Long totalElement = productQueryRepository.getTotalElement(categoryId, brandId, keyword);
-        int totalPage = (int) Math.ceil((double) totalElement/pageable.getPageSize());
+        int totalPage = (int) Math.ceil((double) totalElement/size);
 
-        ProductPageInfo pageInfo = new ProductPageInfo(
+        PageInfo pageInfo = new PageInfo(
                 pageNumber + 1,
                 size,
                 totalElement,

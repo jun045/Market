@@ -2,7 +2,9 @@ package project.market.review;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import project.market.PageInfo;
 import project.market.cart.entity.CartItem;
 import project.market.cart.repository.CartItemRepository;
 import project.market.cart.repository.CartRepository;
@@ -11,6 +13,7 @@ import project.market.member.MemberRepository;
 import project.market.member.enums.Role;
 import project.market.product.Product;
 import project.market.product.ProductRepository;
+import project.market.review.dto.ReviewAndPagingResponse;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
 import project.market.review.dto.UpdateReviewRequest;
@@ -25,7 +28,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
     private final CartItemRepository cartItemRepository;
-    private final CartRepository cartRepository;
+    private final ReviewQueryRepository reviewQueryRepository;
 
     //리뷰 생성
     public ReviewResponse create (Member member, Long productId, ReviewRequest request){
@@ -58,14 +61,25 @@ public class ReviewService {
     }
 
     //리뷰 목록 조회
-    public List<ReviewResponse> getAll (Long productId){
+    public ReviewAndPagingResponse getAll (Long productId, Pageable pageable){
 
-        List<Review> reviews = reviewRepository.findAllByProductIdAndIsDeletedFalse(productId);
+//        List<Review> reviews = reviewRepository.findAllByProductIdAndIsDeletedFalse(productId);
 
-        return reviews.stream().map(
+        int pageNumber = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+
+        List<Review> reviews = reviewQueryRepository.getReviewsAndPaging(productId, pageNumber, size);
+
+        List<ReviewResponse> reviewResponses = reviews.stream().map(
                         ReviewMapper::toResponse)
                 .toList();
 
+        long totalReviews = reviewQueryRepository.getTotalReviews(productId);
+        int totalPage = (int) Math.ceil((double) totalReviews/size);
+
+        PageInfo pageInfo = new PageInfo(pageNumber + 1, size, totalReviews, totalPage);
+
+        return ReviewMapper.toReviewPagingResponse(reviewResponses, pageInfo);
     }
 
     //리뷰 수정

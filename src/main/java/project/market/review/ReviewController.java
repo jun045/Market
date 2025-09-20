@@ -2,12 +2,15 @@ package project.market.review;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.function.EntityResponse;
 import project.market.member.Entity.Member;
+import project.market.review.dto.ReviewAndPagingResponse;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
 import project.market.review.dto.UpdateReviewRequest;
@@ -31,9 +34,12 @@ public class ReviewController {
 
     //리뷰 목록 조회
     @GetMapping("api/v1/products/{productId}/review")
-    public List<ReviewResponse> getAllReviews (@PathVariable Long productId){
+    public ReviewAndPagingResponse getAllReviews (@PathVariable Long productId,
+                                                  @RequestParam (defaultValue = "1")int pageNumber,
+                                                  @RequestParam (defaultValue = "5") int size){
 
-        return reviewService.getAll(productId);
+        Pageable pageable = PageRequest.of(pageNumber -1, size);
+        return reviewService.getAll(productId, pageable);
     }
 
     //리뷰 수정

@@ -55,6 +55,7 @@ public class ProductTest extends AcceptanceTest{
     private Long categoryId;
     private Long parentId;
     private Long brandId;
+    private Long brandId2;
     private Long memberId;
 
     @BeforeEach
@@ -94,11 +95,18 @@ public class ProductTest extends AcceptanceTest{
 
         brandRepository.save(brand);
 
+        Brand brand2 = Brand.builder()
+                .brandName("삼성")
+                .build();
+
+        brandRepository.save(brand2);
+
         memberId = admin.getId();
         token = jwtProvider.createToken(memberId, admin.getRole());
         categoryId = category.getId();
         parentId = parentCategory.getId();
         brandId = brand.getId();
+        brandId2 = brand2.getId();
 
     }
 
@@ -247,8 +255,245 @@ public class ProductTest extends AcceptanceTest{
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .jsonPath()
-                .getList(".", ProductSearchResponse.class);
+                .as(ProductSearchAndPagingResponse.class);
+
+    }
+
+    @DisplayName("상품검색")
+    @Test
+    public void 상품검색 (){
+        ProductResponse product1 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 16 Pro", brandId,
+                "아이폰16Pro",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1600000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product2 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 17 Pro", brandId,
+                "아이폰17 Pro",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1600000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product3 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 17", brandId,
+                "아이폰17",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1400000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product4 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이패드 11", brandId,
+                "아이패드 11 air wifi",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1000000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParam("keyword", "아이패드")
+                .when()
+                .get("/products")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(ProductSearchAndPagingResponse.class);
+
+    }
+
+    @DisplayName("브랜드 검색 테스트")
+    @Test
+    public void 브랜드검색 (){
+        ProductResponse product1 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 16 Pro", brandId,
+                "아이폰16Pro",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1600000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product2 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 17 Pro", brandId,
+                "아이폰17 Pro",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1600000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product3 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 17", brandId,
+                "아이폰17",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1400000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product4 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이패드 11", brandId,
+                "아이패드 11 air wifi",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1000000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product5 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "갤럭시 S25", brandId2,
+                "갤럭시 S25",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1000000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParam("keyword", "삼성")
+                .when()
+                .get("/products")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(ProductSearchAndPagingResponse.class);
+
+    }
+
+    @DisplayName("인기순 정렬 테스트")
+    @Test
+    public void 정렬테스트 (){
+        ProductResponse product1 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 16 Pro", brandId,
+                "아이폰16Pro",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1600000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product2 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 17 Pro", brandId,
+                "아이폰17 Pro",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1600000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product3 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이폰 17", brandId,
+                "아이폰17",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1400000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product4 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "아이패드 11", brandId,
+                "아이패드 11 air wifi",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1000000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        ProductResponse product5 = createProduct(new CreateProductRequest(parentId,
+                categoryId,
+                "갤럭시 S25", brandId2,
+                "갤럭시 S25",
+                "썸네일",
+                "디테일이미지",
+                ProductStatus.SALE,
+                1000000,
+                List.of(createVariant("화이트, 128GB", 10, 0),
+                        createVariant("화이트, 256GB", 20, 100000),
+                        createVariant("블랙, 128gb", 15, 0),
+                        createVariant("블랙, 256GB", 10, 100000))));
+
+        Long productId3 = product3.id();
+        Long productId5 = product5.id();
+
+        getDetail(productId5);
+        getDetail(productId5);
+        getDetail(productId5);
+        getDetail(productId5);
+        getDetail(productId5);
+        getDetail(productId5);
+        getDetail(productId3);
+        getDetail(productId3);
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/products")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(ProductSearchAndPagingResponse.class);
 
     }
 
@@ -328,9 +573,9 @@ public class ProductTest extends AcceptanceTest{
                 .then().log().all()
                 .statusCode(200);
 
-        List<ProductSearchResponse> responseList = getList();
+        ProductSearchAndPagingResponse response = getList();
 
-        assertThat(responseList.size()).isEqualTo(1);
+        assertThat(response.productSearchResponses().size()).isEqualTo(1);
 
     }
 
@@ -356,7 +601,20 @@ public class ProductTest extends AcceptanceTest{
                 .as(ProductResponse.class);
     }
 
-    private List<ProductSearchResponse> getList (){
+    private ProductResponse getDetail (Long productId){
+        return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("productId", productId)
+                .when()
+                .get("/products/{productId}")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(ProductResponse.class);
+
+    }
+
+    private ProductSearchAndPagingResponse getList (){
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .when()
@@ -364,8 +622,7 @@ public class ProductTest extends AcceptanceTest{
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .jsonPath()
-                .getList(".", ProductSearchResponse.class);
+                .as(ProductSearchAndPagingResponse.class);
     }
 
 

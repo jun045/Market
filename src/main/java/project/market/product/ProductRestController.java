@@ -1,15 +1,12 @@
 package project.market.product;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import project.market.member.Entity.Member;
-import project.market.product.dto.CreateProductRequest;
-import project.market.product.dto.ProductResponse;
-import project.market.product.dto.ProductSearchResponse;
-import project.market.product.dto.UpdateProductRequest;
-
-import java.util.List;
+import project.market.product.dto.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -34,8 +31,15 @@ public class ProductRestController {
 
     //상품 전체 조회
     @GetMapping("/products")
-    public List<ProductSearchResponse> findAll(){
-        return productService.findAll();
+    public ProductSearchAndPagingResponse findAll(
+            @RequestParam(required = false) Long categoryId,  //카테고리별 목록 보기
+            @RequestParam(required = false) Long brandId,  //브랜드별 목록 보기
+            @RequestParam(required = false) String keyword,  //검색결과 목록보기
+            @RequestParam(defaultValue = "20") int size,  //한 페이지당 제품 개수
+            @RequestParam(defaultValue = "1") int pageNumber){  //현재 페이지
+
+       Pageable pageable = PageRequest.of(pageNumber - 1, size);
+        return productService.findAll(categoryId, brandId, keyword, pageable);
     }
 
     //상세 조회 (가격 따로 분리?)

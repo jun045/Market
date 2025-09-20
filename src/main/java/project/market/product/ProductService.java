@@ -9,6 +9,8 @@ import project.market.member.Entity.Member;
 import project.market.member.MemberRepository;
 import project.market.member.enums.Role;
 import project.market.product.dto.*;
+import org.springframework.data.domain.Pageable;
+
 
 import java.util.List;
 
@@ -20,6 +22,7 @@ public class ProductService {
     private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
     private final ParentCategoryRepository parentCategoryRepository;
+    private final ProductQueryRepository productQueryRepository;
 
     //등록 - 관리자만 가능
     public ProductResponse create(Member member, CreateProductRequest request) {
@@ -194,24 +197,53 @@ public class ProductService {
                 productUpdate.getUpdatedAt());
     }
 
-    //TODO 페이지네이션 추가
-    //TODO 카테고리별 보기, 브랜드별 보기, 검색으로 보기 등 옵션 추가
-    //TODO 목록에 썸네일 추가 여부
     //전체 목록 조회 (이름, 가격만)
-    public List<ProductSearchResponse> findAll(){
-         List<Product> products = productRepository.findAll();
-         return products.stream()
-                 .map(p -> new ProductSearchResponse(
-                         p.getId(),
-                         p.getProductName(),
-                         p.getListPrice()
-                 )).toList();
+    public ProductSearchAndPagingResponse findAll(Long categoryId,
+                                               Long brandId,
+                                               String keyword,
+                                               Pageable pageable){
+//         List<Product> products = productRepository.findAll();
+
+        int size = pageable.getPageSize();
+        int pageNumber = pageable.getPageNumber();
+
+        List<Product> products = productQueryRepository.searchAndPagingProduct(categoryId,
+                brandId,
+                keyword,
+                pageNumber,
+                size);
+
+        List<ProductSearchResponse> responseList = products.stream()
+                .map(p -> new ProductSearchResponse(
+                        p.getId(),
+                        p.getProductName(),
+                        p.getBrand().getBrandName(),
+                        p.getListPrice(),
+                        p.getThumbnail(),
+                        p.getViewCount()
+                )).toList();
+
+        Long totalElement = productQueryRepository.getTotalElement(categoryId, brandId, keyword);
+        int totalPage = (int) Math.ceil((double) totalElement/pageable.getPageSize());
+
+        ProductPageInfo pageInfo = new ProductPageInfo(
+                pageNumber + 1,
+                size,
+                totalElement,
+                totalPage
+                );
+
+        return new ProductSearchAndPagingResponse(responseList, pageInfo);
     }
 
     //상세조회
+    @Transactional
     public ProductResponse findProduct (Long productId){
         Product product = productRepository.findById(productId)
                 .orElseThrow(()-> new IllegalArgumentException("등록된 상품이 없어 조회 불가능"));
+
+        //조회수 증가
+        productQueryRepository.incrementViewCount(product.getId());
 
         List<OptionVariantResponse> optionVariantResponses = product.getOptionVariants().stream().map(
                 variantResponse -> OptionVariantResponse.builder()

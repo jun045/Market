@@ -38,6 +38,8 @@ public class Product extends BaseEntity {
     @NotNull
     private Integer listPrice; //정가
 
+    private long viewCount = 0L; //상품 조회수 -> 인기상품 정렬 구현에 필요
+
 //    @NotNull
 //    private int salePrice; //최종가(세일가) -> DB 저장 없이 계산으로 반환
 
@@ -70,6 +72,7 @@ public class Product extends BaseEntity {
                    boolean isDeleted,
                    Category category,
 //                   int likeCount,
+                   long viewCount,
                    List<OptionVariant> optionVariants) {
         this.productName = productName;
         this.brand = brand;
@@ -82,6 +85,7 @@ public class Product extends BaseEntity {
         this.isDeleted = false;
         this.category = category;
 //        this.likeCount = likeCount;
+        this.viewCount = 0L;
         this.optionVariants = optionVariants;
     }
 

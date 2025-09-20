@@ -19,6 +19,7 @@ import project.market.product.ProductStatus;
 import project.market.product.dto.CreateProductRequest;
 import project.market.product.dto.OptionVariantRequest;
 import project.market.product.dto.ProductResponse;
+import project.market.review.dto.ReviewAndPagingResponse;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
 import project.market.review.dto.UpdateReviewRequest;
@@ -120,7 +121,7 @@ public class ReviewTest extends AcceptanceTest{
         createReview(userToken3, productId, new ReviewRequest(3, "리뷰내용3"));
 
         //리뷰조회
-        List<ReviewResponse> reviewResponseList = RestAssured.given().log().all()
+        ReviewAndPagingResponse reviewResponseList = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .pathParam("productId", productId)
                 .when()
@@ -128,8 +129,7 @@ public class ReviewTest extends AcceptanceTest{
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .jsonPath()
-                .getList(".", ReviewResponse.class);
+                .as(ReviewAndPagingResponse.class);
     }
 
     @DisplayName("리뷰 수정 테스트")
@@ -191,9 +191,9 @@ public class ReviewTest extends AcceptanceTest{
                 .statusCode(200);
 
         //리뷰조회
-        List<ReviewResponse> reviews = getReviews(productId);
+        ReviewAndPagingResponse reviews = getReviews(productId);
 
-        assertThat(reviews.size()).isEqualTo(2);
+        assertThat(reviews.reviewResponses().size()).isEqualTo(2);
 
     }
 
@@ -226,9 +226,9 @@ public class ReviewTest extends AcceptanceTest{
                 .then().log().all()
                 .statusCode(200);
 
-        List<ReviewResponse> reviews = getReviews(productId);
+        ReviewAndPagingResponse reviews = getReviews(productId);
 
-        assertThat(reviews.size()).isEqualTo(2);
+        assertThat(reviews.reviewResponses().size()).isEqualTo(2);
     }
 
 
@@ -297,7 +297,7 @@ public class ReviewTest extends AcceptanceTest{
     }
 
     //리뷰 목록 조회 매서드
-    private List<ReviewResponse> getReviews (Long productId){
+    private ReviewAndPagingResponse getReviews (Long productId){
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .pathParam("productId", productId)
@@ -306,8 +306,7 @@ public class ReviewTest extends AcceptanceTest{
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .jsonPath()
-                .getList(".", ReviewResponse.class);
+                .as(ReviewAndPagingResponse.class);
     }
 
 }

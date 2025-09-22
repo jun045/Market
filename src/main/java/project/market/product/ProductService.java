@@ -62,20 +62,20 @@ public class ProductService {
     }
 
     //전체 목록 조회 (이름, 가격만)
-    public List<ProductSearchResponse> findAll(){
-         List<Product> products = productRepository.findAll();
-         return products.stream()
-                 .map(p -> new ProductSearchResponse(
-                         p.getId(),
-                         p.getProductName(),
-                         p.getListPrice()
-                 )).toList();
+    public List<ProductSearchResponse> findAll() {
+        List<Product> products = productRepository.findAll();
+        return products.stream()
+                .map(p -> new ProductSearchResponse(
+                        p.getId(),
+                        p.getProductName(),
+                        p.getListPrice()
+                )).toList();
     }
 
     //상세조회
-    public ProductResponse findProduct (Long id){
+    public ProductResponse findProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("등록된 상품이 없어 조회 불가능"));
+                .orElseThrow(() -> new IllegalArgumentException("등록된 상품이 없어 조회 불가능"));
 
         return new ProductResponse(
                 product.getId(),
@@ -89,10 +89,12 @@ public class ProductService {
 
 
     //삭제
-    public void delete (Long id){
-        productRepository.findById(id)
-                .orElseThrow(()->new IllegalArgumentException("상품 찾을 수 없음"));
+    @Transactional
+    public void delete(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("상품 찾을 수 없음"));
 
-        productRepository.deleteById(id);
+        product.deletedProduct();
+        productRepository.save(product);
     }
 }

@@ -18,6 +18,10 @@ import project.market.product.ProductRepository;
 import project.market.product.ProductStatus;
 import project.market.product.dto.CreateProductRequest;
 import project.market.product.dto.ProductResponse;
+import project.market.product.dto.ProductSearchResponse;
+
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
@@ -44,30 +48,8 @@ public class ProductTest {
         RestAssured.port = port;
         databaseCleanup.execute();
 
-        // 브랜드 생성 및 저장
-        Brand brand = Brand.builder()
-                .brandName("브랜드1")
-                .build();
-        brandRepository.save(brand);
-
-        // 카테고리 생성 및 저장
-        Category category = Category.builder()
-                .cateName("카테고리1")
-                .build();
-        categoryRepository.save(category);
-
-        Product product1 = Product.builder()
-                .productName("상품이름1")
-                .description("상품설명1")
-                .thumbnail("썸네일1")
-                .detailImage("상세이미지1")
-                .listPrice(10000)
-                .productStatus(ProductStatus.SALE)
-                .brand(brand)
-                .category(category)
-                .build();
-
-        productRepository.save(product1);
+        brandRepository.save(new Brand("브랜드1", false));
+        categoryRepository.save(new Category("카테고리1", null));
     }
 
     @DisplayName("상품 생성")
@@ -91,6 +73,7 @@ public class ProductTest {
                 .as(ProductResponse.class);
 
         assertThat(product).isNotNull();
+        assertThat(product.name()).isEqualTo("상품이름1");
     }
 
     @DisplayName("상품을 수정한다.")
@@ -141,66 +124,46 @@ public class ProductTest {
 
     }
 
-//    @DisplayName("상품 전체를 조회한다.")
-//    @Test
-//    @WithMockUser
-//    void 상품_전체조회() {
-//        //생성1
-//        ProductResponse product1 = RestAssured
-//                .given().log().all()
-//                .contentType(ContentType.JSON)
-//                .body(new CreateProductRequest(
-//                        "상품이름1",
-//                        "상품설명1",
-//                        "상품썸네일이미지1",
-//                        "상품상세이미지1",
-//                        10000
-//                ))
-//                .when()
-//                .post("/products/register") // POST /products/register 요청
-//                .then().log().all()
-//                .statusCode(200)
-//                .extract()
-//                .as(ProductResponse.class);
-//
-//        assertThat(product1).isNotNull();
-//
-//        // 생성2 추가
-//        ProductResponse product2 = RestAssured
-//                .given().log().all()
-//                .contentType(ContentType.JSON)
-//                .body(new CreateProductRequest(
-//                        "상품이름2",
-//                        "상품설명2",
-//                        "상품썸네일이미지2",
-//                        "상품상세이미지2",
-//                        10000
-//                ))
-//                .when()
-//                .post("/products/register")
-//                .then().log().all()
-//                .statusCode(200)
-//                .extract()
-//                .as(ProductResponse.class);
-//
-//        assertThat(product2).isNotNull();
-//
-//        //전체조회
-//        List<ProductSearchResponse> products = RestAssured
-//                .given().log().all()
-//                .when()
-//                .get("/products") // 서버로 GET /products 요청
-//                .then().log().all()
-//                .statusCode(200)
-//                .extract()
-//                .jsonPath()
-//                .getList(".", ProductSearchResponse.class);
-//
-//        assertThat(products).isNotEmpty();
-//        assertThat(products)
-//                .extracting(p -> p.name())
-//                .contains("상품이름1", "상품이름2");
-//    }
+    @DisplayName("전체조회")
+    @Test
+    void 전체조회() {
+        //생성1
+        ProductResponse product1 = RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .body(new CreateProductRequest(
+                        "상품이름1",
+                        "상품설명1",
+                        "상품썸네일이미지1",
+                        "상품상세이미지1",
+                        10000
+                ))
+                .when()
+                .post("/products/register") // POST /products/register 요청
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(ProductResponse.class);
+
+        assertThat(product1).isNotNull();
+
+        //전체조회
+        List<ProductSearchResponse> products = RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/products")  // GET /products 요청
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList(".", ProductSearchResponse.class);
+
+        assertThat(products).isNotEmpty();
+        assertThat(products).extracting("id").contains(product1.id());
+        assertThat(products).extracting("name").contains("상품이름1");
+        assertThat(products).extracting("price").contains(10000);
+    }
 
     @DisplayName("상품을 상세 조회한다")
     @Test

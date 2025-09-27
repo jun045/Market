@@ -16,7 +16,7 @@ public class OptionJsonValidator {
     private final ObjectMapper objectMapper;
     private final int maxBytes;
 
-    public OptionJsonValidator(ObjectMapper objectMapper, int maxBytes) {
+    public OptionJsonValidator(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         this.maxBytes = 10*1024; // 10KB 기본
     }

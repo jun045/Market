@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import project.market.BaseEntity;
 import project.market.Brand.Brand;
+import project.market.Cate.Category;
 
 @Setter
 @Getter
@@ -35,13 +36,10 @@ public class Product extends BaseEntity {
     @NotNull
     private int listPrice; //정가
 
-    @NotNull
-    private int salePrice; //최종가(세일가)
-
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private ProductStatus productStatus; //판매상태
+    private ProductStatus productStatus; //상품 판매 상태 (기본값: SALE)
 
     private boolean isDeleted = false; //상품 삭제
 
@@ -50,39 +48,37 @@ public class Product extends BaseEntity {
     private Category category;
 
     //좋아요 개수
-    private int likeCount;
+    private int likeCount=0;
 
     @Builder
-    public Product(String productName,
+    public Product(Brand brand,
+                   String productName,
                    String description,
                    String thumbnail,
                    String detailImage,
                    int listPrice,
-                   int salePrice,
                    ProductStatus productStatus,
                    boolean isDeleted,
                    Category category,
                    int likeCount) {
+        this.brand = brand;
         this.productName = productName;
         this.description = description;
         this.thumbnail = thumbnail;
         this.detailImage = detailImage;
         this.listPrice = listPrice;
-        this.salePrice = salePrice;
-        this.productStatus = productStatus;
+        this.productStatus = productStatus != null ? productStatus : ProductStatus.SALE;
         this.isDeleted = isDeleted;
         this.category = category;
-        this.likeCount = likeCount;
+        this.likeCount = likeCount;  //좋아요 개수 (기본값 : 0)
     }
 
-    //할인된 가격 계산
-
     //정보 수정
-    public void update (String productName,
-                   String description,
-                   String thumbnail,
-                   String detailImage,
-                   int listPrice) {
+    public void update(String productName,
+                       String description,
+                       String thumbnail,
+                       String detailImage,
+                       int listPrice) {
         this.productName = productName;
         this.description = description;
         this.thumbnail = thumbnail;
@@ -91,7 +87,7 @@ public class Product extends BaseEntity {
     }
 
     //소프트 딜리트 : 탈퇴시 true
-    public void deletedProduct(){
+    public void deletedProduct() {
         this.isDeleted = true;
     }
 }

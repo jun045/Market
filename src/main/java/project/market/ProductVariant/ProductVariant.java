@@ -65,6 +65,7 @@ public class ProductVariant extends BaseEntity {
 
     //최종 판매 가격(DB저장 안함)
     //할인가 + 추가가격 or 정가 + 추가가격
+    @Transient
     public long calculateFinalPrice(){
         long basePrice = (discountPrice != null)
                 ? discountPrice

@@ -18,6 +18,7 @@ import project.market.ProductVariant.dto.CreateVariantRequest;
 import project.market.auth.JwtProvider;
 import project.market.cart.dto.CartItemResponse;
 import project.market.cart.dto.CreateCartItemRequest;
+import project.market.cart.dto.UpdateCartItemRequest;
 import project.market.cart.repository.CartItemRepository;
 import project.market.cart.repository.CartRepository;
 import project.market.member.Entity.Member;
@@ -51,6 +52,7 @@ public class CartTest extends AcceptanceTest{
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private String adminToken;
+    private String userToken1;
 
     @BeforeEach
     public void setUp (){
@@ -59,6 +61,9 @@ public class CartTest extends AcceptanceTest{
 
         Member admin = dataSeeder.createAdmin();
         adminToken = jwtProvider.createToken(admin.getId(), Role.SELLER);
+
+        Member user1 = dataSeeder.createUser1();
+        userToken1 = jwtProvider.createToken(admin.getId(), Role.BUYER);
 
     }
 
@@ -79,11 +84,11 @@ public class CartTest extends AcceptanceTest{
 
         Long variantId = variant1.id();
 
-        //장바구니 생성
+        //장바구니 아이템 생성
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", "Bearer " + adminToken)
+                .header("Authorization", "Bearer " + userToken1)
                 .body(new CreateCartItemRequest(productId, variantId, 2))
                 .when()
                 .post("me/cart/items")
@@ -110,11 +115,11 @@ public class CartTest extends AcceptanceTest{
 
         Long variantId = variant1.id();
 
-        //장바구니 생성1
+        //장바구니 아이템 생성1
         RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", "Bearer " + adminToken)
+                .header("Authorization", "Bearer " + userToken1)
                 .body(new CreateCartItemRequest(productId, variantId, 2))
                 .when()
                 .post("me/cart/items")
@@ -123,11 +128,11 @@ public class CartTest extends AcceptanceTest{
                 .extract()
                 .as(CartItemResponse.class);
 
-        //장바구니 중복 생성
+        //장바구니 아이템 중복 생성
         CartItemResponse cartItemResponse = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
-                .header("Authorization", "Bearer " + adminToken)
+                .header("Authorization", "Bearer " + userToken1)
                 .body(new CreateCartItemRequest(productId, variantId, 1))
                 .when()
                 .post("me/cart/items")
@@ -138,6 +143,43 @@ public class CartTest extends AcceptanceTest{
 
         assertThat(cartItemResponse.quantity()).isEqualTo(3);
 
+    }
+
+    @DisplayName("장바구니 아이템 수량 수정")
+    @Test
+    public void 수량수정 () throws JsonProcessingException {
+
+        //제품 생성
+        ProductResponse product = createProduct(new CreateProductRequest("아이폰 16", "아이폰 16 Pro", "썸네일", "상세이미지", 1600000));
+        Long productId = product.id();
+
+        //옵션 생성
+        AdminVariantResponse variant1 = createVariant(productId, new CreateVariantRequest(
+                inputOptionValues(Map.of("색상", List.of("화이트"),
+                        "용량", List.of("256GB")))
+                , 10, 0, 1500000L
+        ));
+
+        Long variantId = variant1.id();
+
+        //장바구니 아이템 생성1
+        CartItemResponse cartItemResponse = createCartItem(productId, variantId, 2);
+        Long cartItemId = cartItemResponse.id();
+
+        //장바구니 아이템 수량 수정
+        CartItemResponse updatedCartItem = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken1)
+                .pathParam("cartItemId", cartItemId)
+                .body(new UpdateCartItemRequest(3))
+                .when()
+                .patch("me/cart/items/{cartItemId}")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CartItemResponse.class);
+
+        assertThat(updatedCartItem.quantity()).isEqualTo(3);
     }
 
 
@@ -173,5 +215,18 @@ public class CartTest extends AcceptanceTest{
 
         return objectMapper.writeValueAsString(options);
 
+    }
+
+    public CartItemResponse createCartItem (Long productId, Long variantId, int quantity){
+        return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken1)
+                .body(new CreateCartItemRequest(productId, variantId, quantity))
+                .when()
+                .post("me/cart/items")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CartItemResponse.class);
     }
 }

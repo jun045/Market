@@ -20,6 +20,9 @@ import project.market.ProductVariant.VariantRepository;
 import project.market.ProductVariant.dto.AdminVariantResponse;
 import project.market.ProductVariant.dto.CreateVariantRequest;
 import project.market.ProductVariant.dto.UserVariantResponse;
+import project.market.auth.JwtProvider;
+import project.market.member.Entity.Member;
+import project.market.member.enums.Role;
 import project.market.product.Product;
 import project.market.product.ProductRepository;
 import project.market.product.ProductStatus;
@@ -54,7 +57,15 @@ public class OptionTest {
     @Autowired
     private VariantRepository variantRepository;
 
+    @Autowired
+    private DataSeeder dataSeeder;
+
+    @Autowired
+    private JwtProvider jwtProvider;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private String adminToken;
 
     @BeforeEach
     void setUp(){
@@ -63,6 +74,9 @@ public class OptionTest {
 
         brandRepository.save(new Brand("브랜드1", false));
         categoryRepository.save(new Category("카테고리1", null));
+
+        Member admin = dataSeeder.createAdmin();
+        adminToken = jwtProvider.createToken(admin.getId(), Role.SELLER);
     }
 
     @DisplayName("옵션 생성")
@@ -72,6 +86,7 @@ public class OptionTest {
         ProductResponse product = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
                 .body(new CreateProductRequest(
                         "상품이름1",
                         "상품설명1",
@@ -97,6 +112,7 @@ public class OptionTest {
         //3. 옵션 생성 POST
         AdminVariantResponse variant = RestAssured
                 .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
                 .contentType(ContentType.JSON)
                 .body(new CreateVariantRequest(
@@ -123,6 +139,7 @@ public class OptionTest {
         ProductResponse product = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
                 .body(new CreateProductRequest(
                         "상품이름1",
                         "상품설명1",
@@ -147,6 +164,7 @@ public class OptionTest {
 
         RestAssured
                 .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
                 .contentType(ContentType.JSON)
                 .body(new CreateVariantRequest(optionsJson, 10, 0, null))
@@ -178,6 +196,7 @@ public class OptionTest {
         ProductResponse product = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
                 .body(new CreateProductRequest(
                         "상품이름1",
                         "상품설명1",
@@ -202,6 +221,7 @@ public class OptionTest {
 
         RestAssured
                 .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
                 .contentType(ContentType.JSON)
                 .body(new CreateVariantRequest(
@@ -217,6 +237,7 @@ public class OptionTest {
         // 3. 관리자용 전체조회
         List<AdminVariantResponse> variants = RestAssured
                 .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
                 .when()
                 .get("/admin/products/{productId}/variants")
@@ -237,6 +258,7 @@ public class OptionTest {
         ProductResponse product = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
                 .body(new CreateProductRequest(
                         "상품이름1",
                         "상품설명1",
@@ -261,6 +283,7 @@ public class OptionTest {
 
         AdminVariantResponse variant = RestAssured
                 .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
                 .contentType(ContentType.JSON)
                 .body(new CreateVariantRequest(
@@ -281,6 +304,7 @@ public class OptionTest {
         //상세조회
         AdminVariantResponse detail = RestAssured
                 .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
                 .pathParam("variantId", variantId)
                 .when()
@@ -301,6 +325,7 @@ public class OptionTest {
         ProductResponse product = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
                 .body(new CreateProductRequest(
                         "상품이름1",
                         "상품설명1",
@@ -325,6 +350,7 @@ public class OptionTest {
 
         AdminVariantResponse variant = RestAssured
                 .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
                 .contentType(ContentType.JSON)
                 .body(new CreateVariantRequest(
@@ -350,6 +376,7 @@ public class OptionTest {
 
         AdminVariantResponse update = RestAssured
                 .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
                 .pathParam("variantId", variantId)
                 .contentType(ContentType.JSON)
@@ -378,6 +405,7 @@ public class OptionTest {
         ProductResponse product = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
                 .body(new CreateProductRequest(
                         "상품이름1",
                         "상품설명1",
@@ -402,6 +430,7 @@ public class OptionTest {
 
         AdminVariantResponse variant = RestAssured
                 .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
                 .contentType(ContentType.JSON)
                 .body(new CreateVariantRequest(
@@ -422,6 +451,7 @@ public class OptionTest {
         //삭제
         RestAssured
                 .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
                 .pathParam("variantId", variantId)
                 .contentType(ContentType.JSON)

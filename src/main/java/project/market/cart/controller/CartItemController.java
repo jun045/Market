@@ -2,6 +2,7 @@ package project.market.cart.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import project.market.cart.dto.CartItemResponse;
@@ -28,5 +29,14 @@ public class CartItemController {
                                             @PathVariable Long cartItemId,
                                             @RequestBody UpdateCartItemRequest request){
         return cartItemService.updateCartItem(member, cartItemId, request);
+    }
+
+    @DeleteMapping("me/cart/items/{cartItemId}")
+    public ResponseEntity<Void> deleteCartItem (@AuthenticationPrincipal (expression = "member") Member member,
+                                                @PathVariable Long cartItemId){
+
+        cartItemService.delete(member, cartItemId);
+
+        return ResponseEntity.ok().build();
     }
 }

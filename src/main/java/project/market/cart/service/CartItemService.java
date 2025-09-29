@@ -18,6 +18,8 @@ import project.market.member.MemberRepository;
 import project.market.product.Product;
 import project.market.product.ProductRepository;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class CartItemService {
@@ -88,5 +90,24 @@ public class CartItemService {
         cartItem.setCartItemQuantity(request.quantity());
 
         return CartMapper.toCartItemResponse(cartItem);
+    }
+
+    @Transactional
+    public void delete (Member member, Long cartItemId){
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("로그인이 필요합니다")
+        );
+
+        CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow(
+                () -> new IllegalArgumentException("장바구니에 등록되지 않은 상품입니다.")
+        );
+
+        if(!cartItem.getCart().getMember().getId().equals(user.getId())){
+            throw new IllegalArgumentException("자신의 장바구니 아이템만 삭제할 수 있습니다.");
+        }
+
+        cartItemRepository.delete(cartItem);
+
     }
 }

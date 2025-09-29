@@ -17,6 +17,7 @@ import project.market.ProductVariant.dto.AdminVariantResponse;
 import project.market.ProductVariant.dto.CreateVariantRequest;
 import project.market.auth.JwtProvider;
 import project.market.cart.dto.CartItemResponse;
+import project.market.cart.dto.CartResponse;
 import project.market.cart.dto.CreateCartItemRequest;
 import project.market.cart.dto.UpdateCartItemRequest;
 import project.market.cart.repository.CartItemRepository;
@@ -213,6 +214,60 @@ public class CartTest extends AcceptanceTest{
                 .delete("me/cart/items/{cartItemId}")
                 .then().log().all()
                 .statusCode(200);
+    }
+
+    @DisplayName("장바구니 조회 테스트")
+    @Test
+    public void 장바구니조회 () throws JsonProcessingException {
+
+        //제품 생성
+        ProductResponse product = createProduct(new CreateProductRequest("아이폰 16", "아이폰 16 Pro", "썸네일", "상세이미지", 1600000));
+        Long productId = product.id();
+
+        //옵션 생성
+        AdminVariantResponse variant1 = createVariant(productId, new CreateVariantRequest(
+                inputOptionValues(Map.of("색상", List.of("화이트"),
+                        "용량", List.of("256GB")))
+                , 10, 0, 1500000L
+        ));
+        AdminVariantResponse variant2 = createVariant(productId, new CreateVariantRequest(
+                inputOptionValues(Map.of("색상", List.of("블랙"),
+                        "용량", List.of("256GB")))
+                , 10, 0, 1500000L
+        ));
+        AdminVariantResponse variant3 = createVariant(productId, new CreateVariantRequest(
+                inputOptionValues(Map.of("색상", List.of("화이트"),
+                        "용량", List.of("512GB")))
+                , 10, 0, 1500000L
+        ));
+        AdminVariantResponse variant4 = createVariant(productId, new CreateVariantRequest(
+                inputOptionValues(Map.of("색상", List.of("블랙"),
+                        "용량", List.of("512GB")))
+                , 10, 0, 1500000L
+        ));
+
+        Long variantId1 = variant1.id();
+        Long variantId2 = variant2.id();
+        Long variantId3 = variant3.id();
+        Long variantId4 = variant4.id();
+
+        //장바구니 아이템 생성1
+        CartItemResponse cartItemResponse1 = createCartItem(productId, variantId1, 1);
+        CartItemResponse cartItemResponse2 = createCartItem(productId, variantId2, 2);
+        CartItemResponse cartItemResponse3 = createCartItem(productId, variantId3, 3);
+        CartItemResponse cartItemResponse4 = createCartItem(productId, variantId4, 4);
+
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken1)
+                .when()
+                .get("me/carts")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CartResponse.class);
+
     }
 
 

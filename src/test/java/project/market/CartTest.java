@@ -182,8 +182,41 @@ public class CartTest extends AcceptanceTest{
         assertThat(updatedCartItem.quantity()).isEqualTo(3);
     }
 
+    @DisplayName("장바구니 아이템 삭제 테스트")
+    @Test
+    public void 삭제테스트 () throws JsonProcessingException {
 
-    public ProductResponse createProduct (CreateProductRequest request){
+        //제품 생성
+        ProductResponse product = createProduct(new CreateProductRequest("아이폰 16", "아이폰 16 Pro", "썸네일", "상세이미지", 1600000));
+        Long productId = product.id();
+
+        //옵션 생성
+        AdminVariantResponse variant1 = createVariant(productId, new CreateVariantRequest(
+                inputOptionValues(Map.of("색상", List.of("화이트"),
+                        "용량", List.of("256GB")))
+                , 10, 0, 1500000L
+        ));
+
+        Long variantId = variant1.id();
+
+        //장바구니 아이템 생성1
+        CartItemResponse cartItemResponse = createCartItem(productId, variantId, 2);
+        Long cartItemId = cartItemResponse.id();
+
+        //장바구니 아이템 삭제
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken1)
+                .pathParam("cartItemId", cartItemId)
+                .when()
+                .delete("me/cart/items/{cartItemId}")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+
+    private ProductResponse createProduct (CreateProductRequest request){
         return RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
@@ -197,7 +230,7 @@ public class CartTest extends AcceptanceTest{
                 .as(ProductResponse.class);
     }
 
-    public AdminVariantResponse createVariant (Long productId, CreateVariantRequest request){
+    private AdminVariantResponse createVariant (Long productId, CreateVariantRequest request){
         return RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
@@ -211,13 +244,13 @@ public class CartTest extends AcceptanceTest{
                 .as(AdminVariantResponse.class);
     }
 
-    public String inputOptionValues (Map<String, List<String>> options) throws JsonProcessingException {
+    private String inputOptionValues (Map<String, List<String>> options) throws JsonProcessingException {
 
         return objectMapper.writeValueAsString(options);
 
     }
 
-    public CartItemResponse createCartItem (Long productId, Long variantId, int quantity){
+    private CartItemResponse createCartItem (Long productId, Long variantId, int quantity){
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + userToken1)

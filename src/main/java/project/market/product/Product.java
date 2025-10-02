@@ -2,13 +2,10 @@ package project.market.product;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import project.market.BaseEntity;
-
-import java.time.LocalDateTime;
+import project.market.Brand.Brand;
+import project.market.Cate.Category;
 
 @Setter
 @Getter
@@ -18,6 +15,11 @@ public class Product extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    //브랜드도 따로 분리해야 한 브랜드 상품 다 보기 가능
+    //private String brandName;
+    @ManyToOne
+    private Brand brand;
 
     @NotNull
     private String productName;
@@ -34,19 +36,58 @@ public class Product extends BaseEntity {
     @NotNull
     private int listPrice; //정가
 
+
     @NotNull
-    private int salePrice; //최종가(세일가)
+    @Enumerated(EnumType.STRING)
+    private ProductStatus productStatus; //상품 판매 상태 (기본값: SALE)
 
-    //판매상태
-    @NotNull
-    private productStatus productStatus = project.market.product.productStatus.SALE;
-
-    private String brandName;
-
-    private boolean isDeleted = false;
+    private boolean isDeleted = false; //상품 삭제
 
     //카테고리:상품=1:n
     @ManyToOne
     private Category category;
 
+    //좋아요 개수
+    private int likeCount=0;
+
+    @Builder
+    public Product(Brand brand,
+                   String productName,
+                   String description,
+                   String thumbnail,
+                   String detailImage,
+                   int listPrice,
+                   ProductStatus productStatus,
+                   boolean isDeleted,
+                   Category category,
+                   int likeCount) {
+        this.brand = brand;
+        this.productName = productName;
+        this.description = description;
+        this.thumbnail = thumbnail;
+        this.detailImage = detailImage;
+        this.listPrice = listPrice;
+        this.productStatus = productStatus != null ? productStatus : ProductStatus.SALE;
+        this.isDeleted = isDeleted;
+        this.category = category;
+        this.likeCount = likeCount;  //좋아요 개수 (기본값 : 0)
+    }
+
+    //정보 수정
+    public void update(String productName,
+                       String description,
+                       String thumbnail,
+                       String detailImage,
+                       int listPrice) {
+        this.productName = productName;
+        this.description = description;
+        this.thumbnail = thumbnail;
+        this.detailImage = detailImage;
+        this.listPrice = listPrice;
+    }
+
+    //소프트 딜리트 : 탈퇴시 true
+    public void deletedProduct() {
+        this.isDeleted = true;
+    }
 }

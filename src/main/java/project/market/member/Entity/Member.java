@@ -58,8 +58,8 @@ public class Member extends BaseEntity {
     private List<Address> addresses;
 
     @Builder
-    public Member(Long id, String loginId, String password, String name, String nickname, String email, Role role, MemberStatus memberStatus, Level level, int point, boolean isDeleted, LocalDateTime deletedAt, List<Address> addresses) {
-        this.id = id;
+    public Member(String loginId, String password, String name, String nickname, String email, Role role, MemberStatus memberStatus, Level level, int point, boolean isDeleted, LocalDateTime deletedAt) {
+
         this.loginId = loginId;
         this.password = password;
         this.name = name;

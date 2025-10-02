@@ -7,6 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import project.market.ProductVariant.dto.CreateVariantRequest;
 import project.market.ProductVariant.dto.AdminVariantResponse;
 import project.market.ProductVariant.dto.UserVariantResponse;
+import project.market.member.Entity.Member;
+import project.market.member.MemberRepository;
+import project.market.member.enums.Role;
 import project.market.product.Product;
 import project.market.product.ProductRepository;
 
@@ -20,9 +23,19 @@ public class VariantService {
     private final ProductRepository productRepository;
     private final OptionJsonValidator optionJsonValidator;
     private final OptionJsonParser optionJsonParser;
+    private final MemberRepository memberRepository;
 
     //옵션 생성
-    public AdminVariantResponse create(Long productId, CreateVariantRequest request) {
+    public AdminVariantResponse create(Member member, Long productId, CreateVariantRequest request) {
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("로그인이 필요합니다")
+        );
+
+        if(!user.getRole().equals(Role.SELLER)){
+            throw new IllegalArgumentException("관리자 권한이 필요합니다");
+        }
+
         Product product = productRepository.findById(productId).orElseThrow(() -> {
             log.error("옵션 생성 전 상품 조회 실패 : productId={}", productId);
             return new IllegalArgumentException("상품이 없습니다. productId =" + productId);
@@ -74,7 +87,17 @@ public class VariantService {
 
     //관리자용) 한 상품에 대한 전체조회 (삭제된 상품도 조회)
     @Transactional(readOnly = true)
-    public List<AdminVariantResponse> findAllByProductId(Long productId) {
+    public List<AdminVariantResponse> findAllByProductId(Member member, Long productId) {
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("로그인이 필요합니다")
+        );
+
+        if(!user.getRole().equals(Role.SELLER)){
+            throw new IllegalArgumentException("관리자 권한이 필요합니다");
+        }
+
+
         if (!productRepository.existsById(productId)) {
             throw new IllegalArgumentException("상품이 없습니다. id=" + productId);
         }
@@ -93,7 +116,17 @@ public class VariantService {
 
     //상세조회
     @Transactional(readOnly = true)
-    public AdminVariantResponse findOne(Long productId, Long variantId) {
+    public AdminVariantResponse findOne(Member member, Long productId, Long variantId) {
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("로그인이 필요합니다")
+        );
+
+        if(!user.getRole().equals(Role.SELLER)){
+            throw new IllegalArgumentException("관리자 권한이 필요합니다");
+        }
+
+
         Product product = productRepository.findById(productId).orElseThrow(() -> {
             log.error("상세조회 실패: 상품 없음 productId={}", productId);
             return new IllegalArgumentException("상품이 없습니다. productId =" + productId);
@@ -121,7 +154,17 @@ public class VariantService {
 
     //수정
     @Transactional
-    public AdminVariantResponse updateOption(Long productId, Long variantId, CreateVariantRequest request) {
+    public AdminVariantResponse updateOption(Member member, Long productId, Long variantId, CreateVariantRequest request) {
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("로그인이 필요합니다")
+        );
+
+        if(!user.getRole().equals(Role.SELLER)){
+            throw new IllegalArgumentException("관리자 권한이 필요합니다");
+        }
+
+
         Product product = productRepository.findById(productId).orElseThrow(() -> {
             log.error(" 옵션 수정 실패 : 상품 없음 productId={}", productId);
             return new IllegalArgumentException("상품이 없습니다. productId =" + productId);
@@ -158,7 +201,16 @@ public class VariantService {
 
     //삭제
     @Transactional
-    public void delete(Long productId, Long variantId) {
+    public void delete(Member member, Long productId, Long variantId) {
+
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("로그인이 필요합니다")
+        );
+
+        if(!user.getRole().equals(Role.SELLER)){
+            throw new IllegalArgumentException("관리자 권한이 필요합니다");
+        }
+
         Product product = productRepository.findById(productId).orElseThrow(() -> {
             log.error("옵션 삭제 실패 : 상품 없음 productId={}", productId);
             return new IllegalArgumentException("상품이 없습니다. productId =" + productId);

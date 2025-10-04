@@ -65,4 +65,14 @@ public class CartMapper {
                         .build()
         ).toList();
     }
+
+    public static CartResponse empty (){
+        return CartResponse.builder()
+                .cartId(null)
+                .cartItemResponses(List.of())
+                .totalPrice(0)
+                .totalQuantity(0)
+                .updatedAt(null)
+                .build();
+    }
 }

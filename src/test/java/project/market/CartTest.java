@@ -28,7 +28,6 @@ import project.market.product.ProductRepository;
 import project.market.product.dto.CreateProductRequest;
 import project.market.product.dto.ProductResponse;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -268,6 +267,29 @@ public class CartTest extends AcceptanceTest{
                 .extract()
                 .as(CartResponse.class);
 
+    }
+
+    @DisplayName("장바구니 null 테스트")
+    @Test
+    public void null테스트(){
+
+        //최초 장바구니 아이템 담기 없이 장바구니 접근 -> 비어있는 장바구니 반환
+        CartResponse cartResponse = RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken1)
+                .when()
+                .get("me/carts")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CartResponse.class);
+
+        assertThat(cartResponse.cartItemResponses()).isEqualTo(List.of());
+        assertThat(cartResponse.cartId()).isNull();
+        assertThat(cartResponse.totalPrice()).isEqualTo(0);
+        assertThat(cartResponse.totalQuantity()).isEqualTo(0);
+        assertThat(cartResponse.updatedAt()).isNull();
     }
 
 

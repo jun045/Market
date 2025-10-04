@@ -28,9 +28,15 @@ public class CartService {
                 () -> new IllegalArgumentException("로그인이 필요합니다")
         );
 
-        Cart cart = cartRepository.findByMemberId(user.getId()).orElseThrow(
-                () -> new IllegalArgumentException("자신의 장바구니만 조회할 수 있습니다")
-        );
+        Cart cart = cartRepository.findByMemberId(user.getId()).orElse(null);
+
+        if(cart == null){
+            return CartMapper.empty();
+        }
+
+        if(!cart.getMember().getId().equals(user.getId())){
+            throw new IllegalArgumentException("자신의 장바구니만 조회 가능합니다");
+        }
 
         List<CartItem> cartItems = cartItemRepository.findAllByCartId(cart.getId());
 

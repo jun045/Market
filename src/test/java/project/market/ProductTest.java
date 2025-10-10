@@ -13,6 +13,9 @@ import project.market.Brand.Brand;
 import project.market.Brand.BrandRepository;
 import project.market.Cate.Category;
 import project.market.Cate.CategoryRepository;
+import project.market.auth.JwtProvider;
+import project.market.member.Entity.Member;
+import project.market.member.enums.Role;
 import project.market.product.Product;
 import project.market.product.ProductRepository;
 import project.market.product.ProductStatus;
@@ -43,6 +46,14 @@ public class ProductTest {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private DataSeeder dataSeeder;
+
+    @Autowired
+    private JwtProvider jwtProvider;
+
+    String adminToken;
+
     @BeforeEach
     void setUp(){
         RestAssured.port = port;
@@ -50,6 +61,9 @@ public class ProductTest {
 
         brandRepository.save(new Brand("브랜드1", false));
         categoryRepository.save(new Category("카테고리1", null));
+
+        Member admin = dataSeeder.createAdmin();
+        adminToken = jwtProvider.createToken(admin.getId(), Role.SELLER);
     }
 
     @DisplayName("상품 생성")
@@ -58,6 +72,7 @@ public class ProductTest {
         ProductResponse product = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
                 .body(new CreateProductRequest(
                         "상품이름1",
                         "상품설명1",
@@ -83,6 +98,7 @@ public class ProductTest {
         ProductResponse product = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
                 .body(new CreateProductRequest(
                         "상품이름1",
                         "상품설명1",
@@ -103,6 +119,7 @@ public class ProductTest {
         ProductResponse 수정 = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", product.id())
                 .body(new CreateProductRequest(
                         "상품이름수정",
@@ -131,6 +148,7 @@ public class ProductTest {
         ProductResponse product1 = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
                 .body(new CreateProductRequest(
                         "상품이름1",
                         "상품설명1",
@@ -172,6 +190,7 @@ public class ProductTest {
         ProductResponse product1 = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
                 .body(new CreateProductRequest(
                         "상품이름1",
                         "상품설명1",
@@ -209,6 +228,7 @@ public class ProductTest {
         ProductResponse product = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
                 .body(new CreateProductRequest(
                         "상품이름1",
                         "상품설명1",
@@ -228,6 +248,7 @@ public class ProductTest {
         //삭제
         RestAssured
                 .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", product.id())
                 .when()
                 .delete("/products/{productId}")

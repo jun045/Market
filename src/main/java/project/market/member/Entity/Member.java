@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import project.market.BaseEntity;
+import project.market.address.entity.Address;
 import project.market.member.enums.Level;
 import project.market.member.enums.MemberStatus;
 import project.market.member.enums.Role;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Setter
 @Getter
@@ -52,9 +54,12 @@ public class Member extends BaseEntity {
 
     private LocalDateTime deletedAt;
 
+    @OneToMany(mappedBy = "member")
+    private List<Address> addresses;
+
     @Builder
-    public Member(Long id, String loginId, String password, String name, String nickname, String email, Role role, MemberStatus memberStatus, Level level, int point, boolean isDeleted, LocalDateTime deletedAt) {
-        this.id = id;
+    public Member(String loginId, String password, String name, String nickname, String email, Role role, MemberStatus memberStatus, Level level, int point, boolean isDeleted, LocalDateTime deletedAt) {
+
         this.loginId = loginId;
         this.password = password;
         this.name = name;
@@ -66,6 +71,7 @@ public class Member extends BaseEntity {
         this.point = point;
         this.isDeleted = isDeleted;
         this.deletedAt = deletedAt;
+        this.addresses = addresses;
     }
 
     //회원정보 수정

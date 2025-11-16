@@ -1,0 +1,11 @@
+package project.market.PurchaseOrder.dto;
+
+import project.market.OrderItem.dto.CreateOrderItemRequest;
+
+import java.util.List;
+
+public record CreateOrderRequest(Long memberId,
+                                 int usedPoint,
+                                 List<CreateOrderItemRequest> orderItems
+                                 ) {
+}

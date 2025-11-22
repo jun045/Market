@@ -4,18 +4,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.market.OrderItem.OrderItem;
-import project.market.OrderItem.OrderItemRepository;
-import project.market.OrderItem.dto.CreateOrderItemRequest;
 import project.market.OrderItem.dto.OrderItemResponse;
 import project.market.ProductVariant.ProductVariant;
 import project.market.ProductVariant.VariantRepository;
+import project.market.PurchaseOrder.dto.CreateCartOrderRequest;
 import project.market.PurchaseOrder.dto.CreateOrderRequest;
 import project.market.PurchaseOrder.dto.OrderResponse;
+import project.market.cart.entity.Cart;
+import project.market.cart.entity.CartItem;
+import project.market.cart.repository.CartItemRepository;
+import project.market.cart.repository.CartRepository;
 import project.market.member.Entity.Member;
 import project.market.member.MemberRepository;
 import project.market.member.enums.Role;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,8 @@ public class OrderService {
     private final PurchaseOrderRepository orderRepository;
     private final MemberRepository memberRepository;
     private final VariantRepository variantRepository;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
 
     //주문 생성,수정,조회, 상태관리,포인트관리, 주문데이터 검증,외부연동 인터페이스, 트랜잭션 관리
 
@@ -84,7 +90,7 @@ public class OrderService {
 
     //주문 조회 - 관리자
     @Transactional(readOnly = true)
-    public OrderResponse adminFindOrder(Member member,Long orderId) {
+    public OrderResponse adminFindOrder(Member member, Long orderId) {
         Member user = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new IllegalArgumentException("로그인이 필요합니다"));
 
@@ -172,20 +178,20 @@ public class OrderService {
 
     //주문 수정 - 사용자(취소 요청만 가능)
     @Transactional
-    public void userRequestCancelOrder(Member member, Long orderId){
+    public void userRequestCancelOrder(Member member, Long orderId) {
         Member user = memberRepository.findById(member.getId())
-                .orElseThrow(()-> new IllegalArgumentException("로그인이 필요합니다"));
+                .orElseThrow(() -> new IllegalArgumentException("로그인이 필요합니다"));
 
         PurchaseOrder order = orderRepository.findById(orderId)
-                .orElseThrow(()-> new IllegalArgumentException("주문 찾을 수 없음"));
+                .orElseThrow(() -> new IllegalArgumentException("주문 찾을 수 없음"));
 
-        if (!order.getMember().getId().equals(user.getId())){
+        if (!order.getMember().getId().equals(user.getId())) {
             throw new IllegalStateException("본인 주문만 취소 요청 가능");
         }
 
         //주문 생성,결제 완료만 취소 가능
         if (order.getOrderStatus() != OrderStatus.CREATED &&
-            order.getOrderStatus() != OrderStatus.PAID){
+                order.getOrderStatus() != OrderStatus.PAID) {
             throw new IllegalStateException("취소 요청이 가능한 주문 상태가 아님");
         }
         //주문 취소요청 상태로 변경
@@ -211,4 +217,80 @@ public class OrderService {
         }
         order.deletedOrder();
     }
+
+    //장바구니에서 결제
+    @Transactional
+    public OrderResponse orderCartItems(Member member, CreateCartOrderRequest request) {
+        Member user = memberRepository.findById(member.getId())
+                .orElseThrow(() -> new IllegalArgumentException("로그인이 필요합니다"));
+
+        if (user.getRole().equals(Role.SELLER)) {
+            throw new IllegalStateException("관리자는 주문할 수 없습니다.");
+        }
+
+        Cart cart = cartRepository.findByMemberId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("장바구니가 존재하지 않습니다"));
+
+
+        //장바구니 안 요청한 상품만
+        List<Long> cartItemIds = request.cartItemIds();
+        List<CartItem> selectedItems = cart.getCartItems().stream()
+                .filter(item -> cartItemIds.contains(item.getId()))
+                .toList();
+
+        if (selectedItems.isEmpty()) {
+            throw new IllegalStateException("주문할 상품을 선택하세요");
+        }
+
+        //고른 상품 orderitem으로 변환
+        List<OrderItem> orderItems = selectedItems.stream()
+                .map(cartItem -> {
+                    ProductVariant variant
+                            = variantRepository.findById(cartItem.getProductVariant().getId())
+                            .orElseThrow(() -> new IllegalArgumentException("선택된 상품 옵션 없음: " + cartItem.getProductVariant().getId()));
+
+                    return OrderItem.builder()
+                            .productVariant(variant)
+                            .quantity(cartItem.getQuantity())
+                            .unitPrice((int) variant.calculateFinalPrice())
+                            .build();
+                }).toList();
+
+        //주문 생성
+        PurchaseOrder order = PurchaseOrder.builder()
+                .orderStatus(OrderStatus.CREATED)
+                .member(user)
+                .orderItems(orderItems)
+                .build();
+
+        orderItems.forEach(item -> item.assignOrder(order));
+        order.recalculateOrderTotal();
+
+        orderRepository.save(order);
+
+        //완료된 주문 장바구니에서 삭제
+        cartItemRepository.deleteAll(selectedItems);
+
+        List<OrderItemResponse> itemResponses = order.getOrderItems().stream()
+                .map(orderItem -> new OrderItemResponse(
+                        orderItem.getId(),
+                        orderItem.getProductVariant().getId(),
+                        orderItem.getQuantity(),
+                        orderItem.getUnitPrice(),
+                        orderItem.calculateTotalPrice()
+                )).toList();
+
+        return new OrderResponse(
+                order.getId(),
+                order.getOrderStatus(),
+                order.getOrderDate(),
+                order.getOrderTotalPrice(),
+                order.getUsedPoint(),
+                order.getEarnPoint(),
+                order.getPayAmount(),
+                itemResponses
+        );
+    }
+
+
 }

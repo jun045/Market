@@ -3,14 +3,13 @@ package project.market.PurchaseOrder.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.market.OrderItem.OrderItem;
 import project.market.OrderItem.OrderItemMapper;
 import project.market.OrderItem.dto.OrderItemDetailResponse;
 import project.market.ProductVariant.ProductVariant;
 import project.market.ProductVariant.VariantRepository;
 import project.market.PurchaseOrder.OrderMapper;
 import project.market.PurchaseOrder.OrderStatus;
-import project.market.PurchaseOrder.repository.PurchaseOrderRepository;
+import project.market.PurchaseOrder.PurchaseOrderRepository;
 import project.market.PurchaseOrder.dto.CreateCartOrderRequest;
 import project.market.PurchaseOrder.dto.OrderDetailResponse;
 import project.market.PurchaseOrder.entity.PurchaseOrder;
@@ -30,7 +29,6 @@ import java.util.Optional;
 public class CartOrderService {
     private final MemberRepository memberRepository;
     private final CartRepository cartRepository;
-    private final VariantRepository variantRepository;
     private final PurchaseOrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
 

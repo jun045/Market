@@ -10,7 +10,7 @@ import project.market.ProductVariant.ProductVariant;
 import project.market.ProductVariant.VariantRepository;
 import project.market.PurchaseOrder.OrderMapper;
 import project.market.PurchaseOrder.OrderStatus;
-import project.market.PurchaseOrder.repository.PurchaseOrderRepository;
+import project.market.PurchaseOrder.PurchaseOrderRepository;
 import project.market.PurchaseOrder.dto.CreateOrderRequest;
 import project.market.PurchaseOrder.dto.OrderDetailResponse;
 import project.market.PurchaseOrder.dto.OrderListResponse;

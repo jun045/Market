@@ -66,11 +66,24 @@ public class ProductVariant extends BaseEntity {
     //최종 판매 가격(DB저장 안함)
     //할인가 + 추가가격 or 정가 + 추가가격
     @Transient
-    public long calculateFinalPrice(){
+    public long calculateFinalPrice() {
         long basePrice = (discountPrice != null)
                 ? discountPrice
                 : product.getListPrice();
         return basePrice + this.extraCharge;
+    }
+
+    //재고 확인
+    public void validateStockOrThrow(int quantity) {
+        if (isDeleted) {
+            throw new IllegalStateException("삭제된 옵션입니다");
+        }
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("수량은 1 이상이어야 함");
+        }
+        if (this.stock < quantity) {
+            throw new IllegalArgumentException("재고가 부족합니다.");
+        }
     }
 
     //재고 차감
@@ -79,5 +92,13 @@ public class ProductVariant extends BaseEntity {
             throw new IllegalArgumentException("재고가 부족합니다.");
         }
         this.stock -= quantity;
+    }
+
+    //판매 가능 여부 확인
+    public boolean isSaleAvailable() {
+        return !isDeleted               // 옵션 삭제되지 않고
+                && product != null       // 상품 존재
+                && !product.isDeleted() // 상품 삭제되지 않고
+                && stock > 0;           // 재고 있음
     }
 }

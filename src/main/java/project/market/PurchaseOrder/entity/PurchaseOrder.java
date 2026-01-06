@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -23,7 +24,15 @@ public class PurchaseOrder extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
+
+    @NotNull
+    @Column(nullable = false, unique = true)
+    private String merchantUid;  //주문 고유 id -> 결제시 필요(결제 라이브러리 요구사항)
+
+    private Long paymentId;  //주문에 반영할 결제 정보
+
+    private String paidImpUid;  //주문에 반영할 결제 정보
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -62,7 +71,8 @@ public class PurchaseOrder extends BaseEntity {
     private boolean isDeleted = false;
 
     @Builder
-    public PurchaseOrder(OrderStatus orderStatus,
+    public PurchaseOrder(String merchantUid,
+                         OrderStatus orderStatus,
                          LocalDateTime paidAt,
                          LocalDateTime shippedAt,
                          LocalDateTime deliveredAt,
@@ -73,6 +83,7 @@ public class PurchaseOrder extends BaseEntity {
                          int payAmount,
                          Member member,
                          boolean isDeleted) {
+        this.merchantUid = (merchantUid != null) ? merchantUid : "order_" + UUID.randomUUID();
         this.orderStatus = orderStatus;
         this.orderDate = LocalDateTime.now();
         this.paidAt = paidAt;

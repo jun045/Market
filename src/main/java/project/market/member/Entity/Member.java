@@ -57,8 +57,10 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<Address> addresses;
 
+    private int totalSpentAmount = 0;
+
     @Builder
-    public Member(String loginId, String password, String name, String nickname, String email, Role role, MemberStatus memberStatus, Level level, int point, boolean isDeleted, LocalDateTime deletedAt) {
+    public Member(String loginId, String password, String name, String nickname, String email, Role role, MemberStatus memberStatus, Level level, int point, boolean isDeleted, LocalDateTime deletedAt, List<Address> addresses, int totalSpentAmount) {
 
         this.loginId = loginId;
         this.password = password;
@@ -72,6 +74,7 @@ public class Member extends BaseEntity {
         this.isDeleted = isDeleted;
         this.deletedAt = deletedAt;
         this.addresses = addresses;
+        this.totalSpentAmount = 0;
     }
 
     //회원정보 수정
@@ -94,5 +97,42 @@ public class Member extends BaseEntity {
     public void softDelete () {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
+    }
+
+    //포인트 사용 가능 검증
+    public void validatePoint (int usedPoint){
+        if(this.point < usedPoint){
+            throw new IllegalStateException("보유 포인트가 부족합니다.");
+        }
+    }
+
+    //포인트 적립
+    public void addPoints (int earnedPoint){
+        this.point += earnedPoint;
+    }
+
+    //포인트 사용
+    public void usePoint (int usedPoint){
+        this.point -= usedPoint;
+    }
+
+    //누적금액
+    public void addTotalSpentAmount (int finalPaymentAmount){
+        this.totalSpentAmount += finalPaymentAmount;
+    }
+
+    //등급 갱신
+    public void updateMemberLevel (){
+
+        if(totalSpentAmount >= 3000000)
+                {
+            this.level = Level.GOLD;
+        }
+        else if(totalSpentAmount >= 1000000){
+            this.level = Level.SILVER;
+        }else {
+            this.level = Level.BRONZE;
+        }
+
     }
 }

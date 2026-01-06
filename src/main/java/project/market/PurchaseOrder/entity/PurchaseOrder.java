@@ -190,4 +190,34 @@ public class PurchaseOrder extends BaseEntity {
     public void deletedOrder() {
         this.isDeleted = true;
     }
+
+    //결제 사용자 검증
+    public void validateOwner (Member orderedMember){
+        if(!this.member.getId().equals(orderedMember.getId())){
+            throw new IllegalStateException("자신의 주문에만 접근할 수 있습니다.");
+        }
+    }
+
+    //결제 가능 상태 검증
+    public void validatePurchasePayable (){
+        if(this.orderStatus != OrderStatus.CREATED){
+            throw new IllegalStateException("결제 가능한 주문이 아닙니다.");
+        }
+    }
+
+    //결제 정보 갱신
+    public void setPaymentInfo (Long paymentId, String paidImpUid ){
+        this.paymentId = paymentId;
+        this.paidImpUid = paidImpUid;
+    }
+
+    //주문 상태 검증
+    public boolean isPaymentCompleted (){
+        return this.orderStatus == OrderStatus.PAID;
+    }
+
+    //주문 상태 결제 완료 표기
+    public void completePayment (){
+        this.orderStatus = OrderStatus.PAID;
+    }
 }

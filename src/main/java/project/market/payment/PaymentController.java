@@ -12,31 +12,32 @@ import project.market.payment.dto.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1")
 public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @PostMapping("api/payments/{purchaseOrderId}/validation")
+    @PostMapping("payments/{purchaseOrderId}/validation")
     public PaymentIntentResponse prePayment (@AuthenticationPrincipal (expression = "member") Member member,
                                              @PathVariable Long purchaseOrderId){
         return paymentService.preparePayment(member, purchaseOrderId);
     }
 
-    @PostMapping("api/payments/verify")
+    @PostMapping("payments/verify")
     public PaymentVerifyResponse verifyPayment (@AuthenticationPrincipal(expression = "member") Member member,
                                                 @RequestBody PaymentVerifyRequest request){
 
         return paymentService.verifyAndSave(member, request);
     }
 
-    @PostMapping("api/payments/confirm")
+    @PostMapping("payments/confirm")
     public PaymentConfirmResponse postPayment (@AuthenticationPrincipal (expression = "member") Member member,
                                                @RequestBody PaymentConfirmRequest request){
 
         return paymentService.confirmPayment(member, request);
     }
 
-    @GetMapping("api/me/payments/all")
+    @GetMapping("me/payments/all")
     public PageResponse<PaymentResponse> getAllPayments (@AuthenticationPrincipal (expression = "member")Member member,
                                                          @RequestParam (defaultValue = "1") int pageNumber,
                                                          @RequestParam (defaultValue = "20") int size){

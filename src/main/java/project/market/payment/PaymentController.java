@@ -42,7 +42,7 @@ public class PaymentController {
                                                          @RequestParam (defaultValue = "1") int pageNumber,
                                                          @RequestParam (defaultValue = "20") int size){
 
-        Pageable pageable = PageRequest.of(pageNumber, size);
+        Pageable pageable = PageRequest.of(pageNumber -1, size);
         return paymentService.getAllPayment(member, pageable);
     }
 

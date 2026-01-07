@@ -14,6 +14,7 @@ import project.market.PurchaseOrder.PurchaseOrderRepository;
 import project.market.PurchaseOrder.entity.PayStatus;
 import project.market.PurchaseOrder.entity.PurchaseOrder;
 import project.market.member.Entity.Member;
+import project.market.member.MemberRepository;
 import project.market.member.event.EventType;
 import project.market.member.event.MemberEventPublisher;
 import project.market.payment.dto.*;
@@ -34,6 +35,7 @@ public class PaymentService {
     private final PaymentVerifier paymentVerifier;
     private final MemberEventPublisher eventPublisher;
     private final QPaymentRepository qPaymentRepository;
+    private final MemberRepository memberRepository;
 
     //결제 전 검증
     @Transactional
@@ -119,6 +121,12 @@ public class PaymentService {
     @Transactional
     public PaymentConfirmResponse confirmPayment (Member member, PaymentConfirmRequest request){
 
+        // 포인트와 등급 갱신을 하려면 새로 Member 객체를 직접 가져와야함
+        // 파라미터 주입만으로는 Member의 포인트와 등급 갱신이 안 됨
+        Member user = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("사용자 정보가 일치하지 않습니다.")
+        );
+
         PurchaseOrder purchaseOrder = orderRepository.findByMerchantUid(request.merchantUid()).orElseThrow(
                 () -> new IllegalArgumentException("해당 주문이 존재하지 않습니다.")
         );
@@ -146,12 +154,12 @@ public class PaymentService {
         //부가로직
         //1. 포인트 적립/사용 -> 실패 시 메세지 로그 저장, 메세지 반환
         try{
-            member.usePoint(purchaseOrder.getUsedPoint());
-            member.addPoints(purchaseOrder.getEarnPoint());
+            user.usePoint(purchaseOrder.getUsedPoint());
+            user.addPoints(purchaseOrder.getEarnPoint());
         } catch (Exception e){
             //실패 이벤트 발행(로그 저장)
             eventPublisher.memberPublishFailedEvent(
-                    member.getId(),
+                    user.getId(),
                     purchaseOrder.getId(),
                     EventType.POINT_UPDATE_FAILED,
                     e.getMessage()
@@ -162,12 +170,12 @@ public class PaymentService {
 
         //2. 등급 변경 -> 실패시 로그 저장, 메세지 반환
         try{
-            member.addTotalSpentAmount(purchaseOrder.getPayAmount());
-            member.updateMemberLevel();
+            user.addTotalSpentAmount(purchaseOrder.getPayAmount());
+            user.updateMemberLevel();
         } catch (Exception e){
             //실패 이벤트 발행
             eventPublisher.memberPublishFailedEvent(
-                    member.getId(),
+                    user.getId(),
                     purchaseOrder.getId(),
                     EventType.LEVEL_UPDATE_FAILED,
                     e.getMessage()
@@ -176,7 +184,7 @@ public class PaymentService {
             messages.add("등급 업데이트 실패: 관리자 문의");
         }
 
-        return PaymentMapper.toPaymentConfirmResponse(member, payment, messages);
+        return PaymentMapper.toPaymentConfirmResponse(user, payment, messages);
     }
 
     //결제 내역 조회(1년 치)

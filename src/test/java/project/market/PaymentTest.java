@@ -1,6 +1,9 @@
 package project.market;
 
 import com.siot.IamportRestClient.IamportClient;
+import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.response.IamportResponse;
+import com.siot.IamportRestClient.response.Payment;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,9 +25,16 @@ import project.market.cart.entity.Cart;
 import project.market.member.Entity.Member;
 import project.market.member.MemberRepository;
 import project.market.member.enums.Role;
+import project.market.payment.dto.PaymentIntentResponse;
+import project.market.payment.dto.PaymentVerifyRequest;
 import project.market.product.Product;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
 public class PaymentTest extends AcceptanceTest {
@@ -58,6 +68,7 @@ public class PaymentTest extends AcceptanceTest {
     private Long ov2;
     private Long ov3;
     private Long ov4;
+    private int payAmount;
 
 
     @BeforeEach
@@ -115,6 +126,7 @@ public class PaymentTest extends AcceptanceTest {
         OrderDetailResponse order = createOrder();
         orderId = order.id();
         merchantUid = order.merchantUid();
+        payAmount = order.payAmount();
 
     }
 
@@ -122,9 +134,9 @@ public class PaymentTest extends AcceptanceTest {
     @Test
     public void 결제전검증(){
 
-        //주문생성
-        OrderDetailResponse order = createOrder();
-        orderId = order.id();
+//        //주문생성
+//        OrderDetailResponse order = createOrder();
+//        orderId = order.id();
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -135,6 +147,43 @@ public class PaymentTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(200);
 
+    }
+
+    @DisplayName("결제 모킹 테스트")
+    @Test
+    public void 결제테스트 () throws IamportResponseException, IOException {
+
+        PaymentIntentResponse paymentIntentResponse = preparePayment();
+
+        BigDecimal amount = paymentIntentResponse.amount();
+        String merchantUidForPay = paymentIntentResponse.merchantUid();
+
+        // Mcok PG 응답 (Payment)
+        com.siot.IamportRestClient.response.Payment mockPgPayment = mock(com.siot.IamportRestClient.response.Payment.class);
+
+        when(mockPgPayment.getImpUid()).thenReturn("imp_test_123");
+        when(mockPgPayment.getMerchantUid()).thenReturn(merchantUid);
+        when(mockPgPayment.getAmount()).thenReturn(BigDecimal.valueOf(100));
+        when(mockPgPayment.getStatus()).thenReturn("paid");
+
+        //Mock IamportResponse
+        IamportResponse<Payment> mockResponse = mock(IamportResponse.class);
+
+        when(mockResponse.getResponse()).thenReturn(mockPgPayment);  //mockPgPayment 반환
+
+        //IamportClient Mock 설정
+        when(iamportClient.paymentByImpUid("imp_test_123")).thenReturn(mockResponse);
+
+        PaymentVerifyRequest request = new PaymentVerifyRequest("imp_test_123", merchantUidForPay, amount);
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .body(request)
+                .when()
+                .post("/api/v1/payments/verify")
+                .then().log().all()
+                .statusCode(200);
     }
 
     //주문 생성 메서드
@@ -157,6 +206,21 @@ public class PaymentTest extends AcceptanceTest {
                 .statusCode(200)
                 .extract()
                 .as(OrderDetailResponse.class);
+    }
+
+    //결제 전 검증 메서드
+    private PaymentIntentResponse preparePayment (){
+
+        return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .pathParam("ordersId", orderId)
+                .when()
+                .post("/api/v1/payments/{ordersId}/validation")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(PaymentIntentResponse.class);
     }
 
 

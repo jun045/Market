@@ -127,7 +127,7 @@ public class PaymentService {
                 () -> new IllegalArgumentException("결제 내역이 존재하지 않습니다.")
         );
 
-        //결제 전 검증
+        //결제 검증
         purchaseOrder.validateOwner(member);
         payment.validateMatch(member);
 

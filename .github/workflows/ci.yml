@@ -11,6 +11,9 @@ env:
   POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
   POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
   POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  IAMPORT_API_KEY: ${{ secrets.IAMPORT_API_KEY }}
+  IAMPORT_API_SECRET: ${{ secrets.IAMPORT_API_SECRET }}
+  IAMPORT_CLIENT_KEY: ${{ secrets.IAMPORT_CLIENT_KEY }}
 
 jobs:
   test:

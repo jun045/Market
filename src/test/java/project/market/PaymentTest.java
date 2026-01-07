@@ -216,6 +216,36 @@ public class PaymentTest extends AcceptanceTest {
 
     }
 
+    @DisplayName("결제 내역 조회 테스트")
+    @Test
+    public void 결제내역조회 () throws IamportResponseException, IOException {
+        //결제 의도 생성
+        PaymentIntentResponse paymentIntentResponse = preparePayment();
+
+        BigDecimal amount = paymentIntentResponse.amount();
+        String merchantUidForPay = paymentIntentResponse.merchantUid();
+
+        //결제
+        pgPayment(merchantUidForPay, amount);
+
+        //결제 후처리
+        confirmPayment();
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .when()
+                .get("/api/v1/me/payments/all")
+                .then().log().all()
+                .statusCode(200);
+
+    }
+
+
+
+
+
+
     //주문 생성 메서드
     private OrderDetailResponse createOrder () {
 
@@ -285,6 +315,21 @@ public class PaymentTest extends AcceptanceTest {
                 .extract()
                 .as(PaymentVerifyResponse.class);
 
+    }
+
+    //결제 후처리 메서드
+    private PaymentConfirmResponse confirmPayment (){
+
+        return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .body(new PaymentConfirmRequest("imp_test_123", merchantUid))
+                .when()
+                .post("/api/v1/payments/confirm")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(PaymentConfirmResponse.class);
     }
 
 

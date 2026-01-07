@@ -24,15 +24,16 @@ import project.market.auth.JwtProvider;
 import project.market.cart.entity.Cart;
 import project.market.member.Entity.Member;
 import project.market.member.MemberRepository;
+import project.market.member.enums.Level;
 import project.market.member.enums.Role;
-import project.market.payment.dto.PaymentIntentResponse;
-import project.market.payment.dto.PaymentVerifyRequest;
+import project.market.payment.dto.*;
 import project.market.product.Product;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -134,10 +135,6 @@ public class PaymentTest extends AcceptanceTest {
     @Test
     public void 결제전검증(){
 
-//        //주문생성
-//        OrderDetailResponse order = createOrder();
-//        orderId = order.id();
-
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + userToken)
@@ -153,6 +150,7 @@ public class PaymentTest extends AcceptanceTest {
     @Test
     public void 결제테스트 () throws IamportResponseException, IOException {
 
+        //결제 의도 생성
         PaymentIntentResponse paymentIntentResponse = preparePayment();
 
         BigDecimal amount = paymentIntentResponse.amount();
@@ -184,6 +182,38 @@ public class PaymentTest extends AcceptanceTest {
                 .post("/api/v1/payments/verify")
                 .then().log().all()
                 .statusCode(200);
+    }
+
+    @DisplayName("결제 후 트랜잭션 테스트")
+    @Test
+    public void 트랜젝션테스트 () throws IamportResponseException, IOException {
+
+        //결제 의도 생성
+        PaymentIntentResponse paymentIntentResponse = preparePayment();
+
+        BigDecimal amount = paymentIntentResponse.amount();
+        String merchantUidForPay = paymentIntentResponse.merchantUid();
+
+        //결제
+        PaymentVerifyResponse payment = pgPayment(merchantUidForPay, amount);
+
+        //결제 후 트랜지션
+        PaymentConfirmResponse response = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .body(new PaymentConfirmRequest("imp_test_123", merchantUid))
+                .when()
+                .post("/api/v1/payments/confirm")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(PaymentConfirmResponse.class);
+
+        Member refreshedMember = memberRepository.findById(user1.getId()).orElseThrow();
+
+        assertThat(refreshedMember.getTotalSpentAmount()).isEqualTo(16000000);
+        assertThat(refreshedMember.getLevel()).isEqualTo(Level.GOLD);
+
     }
 
     //주문 생성 메서드
@@ -221,6 +251,40 @@ public class PaymentTest extends AcceptanceTest {
                 .statusCode(200)
                 .extract()
                 .as(PaymentIntentResponse.class);
+    }
+
+    //결제 진행 메서드
+    private PaymentVerifyResponse pgPayment (String merchantUid, BigDecimal amount) throws IamportResponseException, IOException {
+
+        // Mcok PG 응답 (Payment)
+        com.siot.IamportRestClient.response.Payment mockPgPayment = mock(com.siot.IamportRestClient.response.Payment.class);
+
+        when(mockPgPayment.getImpUid()).thenReturn("imp_test_123");
+        when(mockPgPayment.getMerchantUid()).thenReturn(merchantUid);
+        when(mockPgPayment.getAmount()).thenReturn(BigDecimal.valueOf(100));
+        when(mockPgPayment.getStatus()).thenReturn("paid");
+
+        //Mock IamportResponse
+        IamportResponse<Payment> mockResponse = mock(IamportResponse.class);
+
+        when(mockResponse.getResponse()).thenReturn(mockPgPayment);  //mockPgPayment 반환
+
+        //IamportClient Mock 설정
+        when(iamportClient.paymentByImpUid("imp_test_123")).thenReturn(mockResponse);
+
+        PaymentVerifyRequest request = new PaymentVerifyRequest("imp_test_123", merchantUid, amount);
+
+        return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .body(request)
+                .when()
+                .post("/api/v1/payments/verify")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(PaymentVerifyResponse.class);
+
     }
 
 

@@ -78,9 +78,13 @@ public class Payment {
         this.payMethod = pg.getPayMethod();
         this.pgProvider = pg.getPgProvider();
         this.amount = pg.getAmount();
-        this.paidAt = pg.getPaidAt() != null ?
-                LocalDateTime.ofInstant(pg.getPaidAt().toInstant(), ZoneId.of("Asia/Seoul"))
-                : null;
+
+        if (pg.getPaidAt() != null) {
+            this.paidAt = LocalDateTime.ofInstant(
+                    pg.getPaidAt().toInstant(),
+                    ZoneId.of("Asia/Seoul")
+            );
+        }
     }
 
     //결제 완료 후 PayStatus Ready -> Paid
@@ -90,6 +94,10 @@ public class Payment {
         }
 
         this.payStatus = PayStatus.PAID;
+
+        if (this.paidAt == null) {
+            this.paidAt = LocalDateTime.now();
+        }
     }
 
     //결제 전 최종 검증

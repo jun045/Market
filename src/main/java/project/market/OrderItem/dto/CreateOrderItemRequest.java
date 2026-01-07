@@ -1,5 +1,8 @@
 package project.market.OrderItem.dto;
 
-public record CreateOrderItemRequest(Long productVariantId,
-                                     int quantity) {
-}
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record CreateOrderItemRequest(
+        @JsonProperty("productVariantId") Long productVariantId,
+        @JsonProperty("quantity") int quantity
+) {}

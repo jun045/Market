@@ -1,9 +1,10 @@
-package project.market;
+package project.market.paymentTest;
 
 import com.siot.IamportRestClient.IamportClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
+import project.market.AcceptanceTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;

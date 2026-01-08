@@ -1,4 +1,4 @@
-package project.market;
+package project.market.paymentTest;
 
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -13,8 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import project.market.AcceptanceTest;
 import project.market.Brand.Brand;
 import project.market.Cate.Category;
+import project.market.DataSeeder;
+import project.market.DatabaseCleanup;
 import project.market.OrderItem.dto.CreateOrderItemRequest;
 import project.market.ProductVariant.ProductVariant;
 import project.market.PurchaseOrder.dto.CreateOrderRequest;
@@ -43,8 +46,10 @@ public class PaymentTest extends AcceptanceTest {
     @LocalServerPort
     int port;
 
-    @Autowired DatabaseCleanup databaseCleanup;
-    @Autowired DataSeeder dataSeeder;
+    @Autowired
+    DatabaseCleanup databaseCleanup;
+    @Autowired
+    DataSeeder dataSeeder;
     @Autowired JwtProvider jwtProvider;
     @Autowired MemberRepository memberRepository;
 

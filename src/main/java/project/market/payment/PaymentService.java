@@ -101,7 +101,7 @@ public class PaymentService {
             //주문 쪽에 결제 정보 매핑
             purchaseOrder.setPaymentInfo(payment.getId(), pg.getImpUid());
 
-            return PaymentMapper.success("결제 성공", payment.getMerchantUid(), pgResponse);
+            return PaymentMapper.success("결제 성공", payment, pgResponse);
         }
 
         //결제 검증 실패 로직(결제 실패 메세지 반환)

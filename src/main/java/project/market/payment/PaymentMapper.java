@@ -21,14 +21,16 @@ public class PaymentMapper {
                 .build();
     }
 
-    public static PaymentVerifyResponse success (String message, String merchantUid, IamportResponse<com.siot.IamportRestClient.response.Payment> pgResponse){
+    public static PaymentVerifyResponse success (String message, Payment payment, IamportResponse<com.siot.IamportRestClient.response.Payment> pgResponse){
         return PaymentVerifyResponse.builder()
                 .success(true)
                 .message(message)
-                .merchantUid(merchantUid)
+                .merchantUid(payment.getMerchantUid())
                 .amount(pgResponse.getResponse().getAmount())
                 .buyerName(pgResponse.getResponse().getBuyerName())
                 .buyerEmail(pgResponse.getResponse().getBuyerEmail())
+                .payStatus(payment.getPayStatus())
+                .paidAt(payment.getPaidAt())
                 .build();
     }
 

@@ -4,6 +4,7 @@ import lombok.Builder;
 import project.market.PurchaseOrder.entity.PayStatus;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Builder
 public record PaymentVerifyResponse(boolean success,
@@ -11,6 +12,7 @@ public record PaymentVerifyResponse(boolean success,
                                     String merchantUid,
                                     BigDecimal amount,
                                     PayStatus payStatus,
+                                    LocalDateTime paidAt,
                                     String buyerName,
                                     String buyerEmail) {
 }

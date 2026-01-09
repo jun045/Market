@@ -7,6 +7,7 @@ import project.market.OrderItem.OrderItem;
 import project.market.OrderItem.OrderItemRepository;
 import project.market.member.Entity.Member;
 import project.market.product.Product;
+import project.market.review.dto.DeleteReviewResponse;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
 
@@ -55,5 +56,22 @@ public class ReviewService {
         review.updateReview(request.rating(), request.content());
 
         return ReviewResponse.from(review);
+    }
+
+    @Transactional
+    public DeleteReviewResponse delete (Member member, Long reviewId){
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
+        );
+
+        //리뷰 작성자 검증
+        review.validateReviewOwner(member);
+
+        //리뷰 삭제
+        review.softDelete();
+        review.getOrderItem().unMarkReviewed();
+
+        return DeleteReviewResponse.from(review);
     }
 }

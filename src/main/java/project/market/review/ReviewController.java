@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import project.market.member.Entity.Member;
+import project.market.review.dto.DeleteReviewResponse;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
 
@@ -31,6 +32,12 @@ public class ReviewController {
                                         @Valid @RequestBody ReviewRequest request){
 
         return reviewService.update(member, reviewId, request);
+    }
+
+    @DeleteMapping("api/v1/products/reviews/{reviewId}/delete")
+    public DeleteReviewResponse deleteReview (@AuthenticationPrincipal (expression = "member") Member member,
+                                              @PathVariable Long reviewId){
+        return reviewService.delete(member, reviewId);
     }
 
 

@@ -161,4 +161,12 @@ public class OrderItem extends BaseEntity {
         }
         this.isReviewed = true;
     }
+
+    //리뷰 작성 완료 표시 해제(true -> false) - 사용 위치 ReviewService
+    public void unMarkReviewed (){
+        if(!isReviewed){
+            throw new IllegalArgumentException("리뷰가 존재하지 않습니다.");
+        }
+        this.isReviewed = false;
+    }
 }

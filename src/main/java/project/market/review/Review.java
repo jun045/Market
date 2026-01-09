@@ -76,4 +76,9 @@ public class Review extends BaseEntity {
             throw new IllegalArgumentException("본인이 작성한 리뷰만 수정/삭제 할 수 있습니다.");
         }
     }
+
+    public void softDelete (){
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
 }

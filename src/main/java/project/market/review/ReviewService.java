@@ -74,4 +74,17 @@ public class ReviewService {
 
         return DeleteReviewResponse.from(review);
     }
+
+    //관리자 리뷰 삭제
+    @Transactional
+    public DeleteReviewResponse adminDelete (Member member, Long reviewId){
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
+        );
+
+        review.softDelete();  //isReviewed = true 상태 유지. 관리자 권한 삭제시 사용자는 리뷰를 재작성 할 수 없음
+
+        return DeleteReviewResponse.from(review);
+    }
 }

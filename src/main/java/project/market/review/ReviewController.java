@@ -2,6 +2,7 @@ package project.market.review;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import project.market.member.Entity.Member;
@@ -38,6 +39,14 @@ public class ReviewController {
     public DeleteReviewResponse deleteReview (@AuthenticationPrincipal (expression = "member") Member member,
                                               @PathVariable Long reviewId){
         return reviewService.delete(member, reviewId);
+    }
+
+    @DeleteMapping("api/v1/admin/products/reviews/{reviewId}/delete")
+    @PreAuthorize("hasRole('SELLER')")
+    public DeleteReviewResponse deleteForAdmin (@AuthenticationPrincipal (expression = "member") Member member,
+                                                @PathVariable Long reviewId){
+
+        return reviewService.adminDelete(member, reviewId);
     }
 
 

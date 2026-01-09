@@ -5,7 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import project.market.BaseEntity;
 import project.market.ProductVariant.ProductVariant;
+import project.market.PurchaseOrder.OrderStatus;
 import project.market.PurchaseOrder.entity.PurchaseOrder;
+import project.market.member.Entity.Member;
 
 import java.util.Objects;
 
@@ -33,10 +35,14 @@ public class OrderItem extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private ProductVariant productVariant;
 
+    //리뷰 작성 확인용
+    private Boolean isReviewed = false;
+
     @Builder
     public OrderItem(ProductVariant productVariant,
                      int quantity,
-                     int unitPrice
+                     int unitPrice,
+                     Boolean isReviewed
     ) {
         this.productVariant = Objects.requireNonNull(productVariant, "productVariant required");
 
@@ -46,6 +52,7 @@ public class OrderItem extends BaseEntity {
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         recalculateTotal(); //총액 계산
+        this.isReviewed = false;
     }
 
     //orderitem 스스로 어떤 purchase에 속하는지 인지하는 역할
@@ -130,5 +137,28 @@ public class OrderItem extends BaseEntity {
         return (id != null)
                 ? id.hashCode()
                 : (productVariant != null ? productVariant.hashCode() : 0);
+    }
+
+    //리뷰 작성 가능 상태인지 검증 - 사용 위치 ReivewService
+    public void validateReviewable (Member member){
+        if(!purchaseOrder.getMember().getId().equals(member.getId())){
+            throw new IllegalArgumentException("본인의 주문만 리뷰 작성 할 수 있습니다.");
+        }
+
+        if(!purchaseOrder.getOrderStatus().equals(OrderStatus.DELIVERED)){
+            throw new IllegalArgumentException("리뷰는 배송이 완료된 후에 작성할 수 있습니다.");
+        }
+
+        if(isReviewed){
+            throw new IllegalArgumentException("이미 리뷰를 작성하였습니다.");
+        }
+    }
+
+    //리뷰 작성 완료 표시 - 사용 위치 ReviewService
+    public void markReviewed (){
+        if(isReviewed){
+            throw new IllegalArgumentException("이미 리뷰를 작성하였습니다.");
+        }
+        this.isReviewed = true;
     }
 }

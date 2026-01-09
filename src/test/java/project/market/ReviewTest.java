@@ -60,18 +60,17 @@ public class ReviewTest extends AcceptanceTest {
     private Long cartItemId4;
     private Member user1;
     private String merchantUid;
-    private Long orderId;
     private Long addressId1;
     private Long addressId2;
     private Long ov1;
     private Long ov2;
     private Long ov3;
     private Long ov4;
-    private int payAmount;
     private Long oi1;
     private Long oi2;
     private Long oi3;
     private Long oi4;
+    private Long reviewedProductId;
 
 
     @BeforeEach
@@ -132,6 +131,8 @@ public class ReviewTest extends AcceptanceTest {
         oi2 = order.getOrderItems().get(1).getId();
         oi3 = order.getOrderItems().get(2).getId();
         oi4 = order.getOrderItems().get(3).getId();
+
+        reviewedProductId = order.getOrderItems().get(0).getProductVariant().getProduct().getId();
     }
 
     @DisplayName("리뷰 생성 테스트")
@@ -210,6 +211,24 @@ public class ReviewTest extends AcceptanceTest {
                 .statusCode(200)
                 .extract()
                 .as(DeleteReviewResponse.class);
+    }
+
+    @DisplayName("리뷰 목록 조회 테스트")
+    @Test
+    public void 리뷰목록조회 (){
+
+        //리뷰 생성
+        ReviewResponse review = createReview();
+
+
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .pathParam("productId", reviewedProductId)
+                .when()
+                .get("api/v1/products/{productId}/reviews")
+                .then().log().all()
+                .statusCode(200);
     }
 
 

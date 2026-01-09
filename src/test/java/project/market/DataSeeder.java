@@ -299,30 +299,6 @@ public class DataSeeder {
 
     public PurchaseOrder createOrder (){
 
-//        orderItem1 = OrderItem.builder()
-//                .productVariant(productVariant1)
-//                .quantity(1)
-//                .unitPrice(10000)
-//                .build();
-//
-//        orderItem2 = OrderItem.builder()
-//                .productVariant(productVariant2)
-//                .quantity(2)
-//                .unitPrice(20000)
-//                .build();
-//
-//        orderItem3 = OrderItem.builder()
-//                .productVariant(productVariant3)
-//                .quantity(3)
-//                .unitPrice(30000)
-//                .build();
-//
-//        orderItem4 = OrderItem.builder()
-//                .productVariant(productVariant4)
-//                .quantity(4)
-//                .unitPrice(40000)
-//                .build();
-
         order1 = PurchaseOrder.builder()
                 .orderStatus(OrderStatus.CREATED)
                 .usedPoint(0)
@@ -339,6 +315,26 @@ public class DataSeeder {
 
         return order1;
 
+    }
+
+    public PurchaseOrder createCompletedOrder (){
+
+        PurchaseOrder completedOrder = PurchaseOrder.builder()
+                .orderStatus(OrderStatus.DELIVERED)
+                .merchantUid("order_test_merchant_uid")
+                .usedPoint(0)
+                .earnPoint(0)
+                .payAmount(100)
+                .member(user1)
+                .isDeleted(false)
+                .build();
+
+        completedOrder.addOrderItem(productVariant1, 1);
+        completedOrder.addOrderItem(productVariant2, 2);
+        completedOrder.addOrderItem(productVariant3, 3);
+        completedOrder.addOrderItem(productVariant4, 4);
+
+        return ordersRepository.save(completedOrder);
     }
 
 

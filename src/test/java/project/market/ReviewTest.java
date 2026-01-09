@@ -22,6 +22,7 @@ import project.market.member.Entity.Member;
 import project.market.member.MemberRepository;
 import project.market.member.enums.Role;
 import project.market.product.Product;
+import project.market.review.dto.DeleteReviewResponse;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
 
@@ -170,6 +171,25 @@ public class ReviewTest extends AcceptanceTest {
                 .statusCode(200)
                 .extract()
                 .as(ReviewResponse.class);
+    }
+
+    @DisplayName("리뷰 삭제 테스트")
+    @Test
+    public void 리뷰삭제 (){
+
+        ReviewResponse review = createReview();
+        Long reviewId = review.reviewId();
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .pathParam("reviewId", reviewId)
+                .when()
+                .delete("api/v1/products/reviews/{reviewId}/delete")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(DeleteReviewResponse.class);
     }
 
 

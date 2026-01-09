@@ -31,6 +31,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/v1/admin/**").hasRole("SELLER")
                         .requestMatchers("api/v1/members",
                                 "api/v1/members/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()

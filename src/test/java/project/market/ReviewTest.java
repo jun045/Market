@@ -150,6 +150,46 @@ public class ReviewTest extends AcceptanceTest {
 
     }
 
+    @DisplayName("리뷰 수정 테스트")
+    @Test
+    public void 리뷰수정 (){
+
+        //리뷰 생성
+        ReviewResponse reviewResponse = createReview();
+        Long reviewId = reviewResponse.reviewId();
+
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .pathParam("reviewId", reviewId)
+                .body(new ReviewRequest(4, "수정된 내용"))
+                .when()
+                .put("api/v1/products/reviews/{reviewId}")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(ReviewResponse.class);
+    }
+
+
+
+
+
+    private ReviewResponse createReview (){
+         return RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .pathParam("orderItemId", oi1)
+                .body(new ReviewRequest(5, "리뷰내용"))
+                .when()
+                .post("api/v1/order_item/{orderItemId}/reviews")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(ReviewResponse.class);
+    }
+
 
 
 

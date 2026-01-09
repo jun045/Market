@@ -26,10 +26,6 @@ import project.market.review.dto.DeleteReviewResponse;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @ActiveProfiles("test")
 public class ReviewTest extends AcceptanceTest {
     @LocalServerPort

@@ -11,7 +11,6 @@ import project.market.OrderItem.OrderItem;
 import project.market.member.Entity.Member;
 import project.market.product.Product;
 
-import java.beans.JavaBean;
 import java.time.LocalDateTime;
 
 @Entity

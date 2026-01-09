@@ -2,9 +2,12 @@ package project.market.review;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import project.market.PageResponse;
 import project.market.member.Entity.Member;
 import project.market.review.dto.DeleteReviewResponse;
 import project.market.review.dto.ReviewRequest;
@@ -47,6 +50,15 @@ public class ReviewController {
                                                 @PathVariable Long reviewId){
 
         return reviewService.adminDelete(member, reviewId);
+    }
+
+    @GetMapping("api/v1/products/{productId}/reviews")
+    public PageResponse<ReviewResponse> getAllReviews (@PathVariable Long productId,
+                                                       @RequestParam (defaultValue = "1") int pageNumber,
+                                                       @RequestParam (defaultValue = "5") int size){
+
+        Pageable pageable = PageRequest.of(pageNumber -1, size);
+        return reviewService.getAll(productId, pageable);
     }
 
 

@@ -50,7 +50,7 @@ public class Review extends BaseEntity {
         this.orderItem = orderItem;
         this.rating = rating;
         this.content = content;
-        this.isDeleted = isDeleted;
+        this.isDeleted = false;
         this.deletedAt = deletedAt;
     }
 

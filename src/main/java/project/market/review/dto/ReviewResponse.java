@@ -4,6 +4,7 @@ import lombok.Builder;
 import project.market.review.Review;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 public record ReviewResponse(Long reviewId,
@@ -26,5 +27,9 @@ public record ReviewResponse(Long reviewId,
                 .createdAt(review.getCreatedAt())
                 .updatedAt(review.getUpdatedAt())
                 .build();
+    }
+
+    public static List<ReviewResponse> fromList (List<Review> reviews){
+        return reviews.stream().map(ReviewResponse::from).toList();
     }
 }

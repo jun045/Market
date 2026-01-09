@@ -192,6 +192,26 @@ public class ReviewTest extends AcceptanceTest {
                 .as(DeleteReviewResponse.class);
     }
 
+    @DisplayName("관리자 리뷰 삭제 테스트")
+    @Test
+    public void 관리자리뷰삭제 (){
+
+        ReviewResponse review = createReview();
+        Long reviewId = review.reviewId();
+
+        RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
+                .pathParam("reviewId", reviewId)
+                .when()
+                .delete("api/v1/admin/products/reviews/{reviewId}/delete")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(DeleteReviewResponse.class);
+    }
+
 
 
 

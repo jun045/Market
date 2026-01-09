@@ -2,6 +2,7 @@ package project.market.review;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.market.OrderItem.OrderItem;
 import project.market.OrderItem.OrderItemRepository;
 import project.market.member.Entity.Member;
@@ -16,6 +17,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final OrderItemRepository orderItemRepository;
 
+    //리뷰 생성
     public ReviewResponse create (Member member, Long orderItemId, ReviewRequest request){
 
         OrderItem orderItem = orderItemRepository.findById(orderItemId).orElseThrow(
@@ -36,5 +38,22 @@ public class ReviewService {
 
         return ReviewResponse.from(review);
 
+    }
+
+    //리뷰 수정
+    @Transactional
+    public ReviewResponse update (Member member, Long reviewId, ReviewRequest request){
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
+        );
+
+        //리뷰 작성자 검증
+        review.validateReviewOwner(member);
+
+        //리뷰 수정
+        review.updateReview(request.rating(), request.content());
+
+        return ReviewResponse.from(review);
     }
 }

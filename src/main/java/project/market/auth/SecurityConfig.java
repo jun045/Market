@@ -31,9 +31,11 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/v1/admin/**").hasRole("SELLER")
                         .requestMatchers("api/v1/members",
                                 "api/v1/members/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/v1/products/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").permitAll() //나중에 hasRole로 바꾸기
                         .requestMatchers("/api/v1/orders/**").permitAll() //나중에 hasRole로 바꾸기
                         .anyRequest().authenticated())

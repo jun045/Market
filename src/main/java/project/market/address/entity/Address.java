@@ -41,8 +41,7 @@ public class Address extends BaseEntity {
     private Member member;
 
     @Builder
-    public Address(Long id, String addressName, String recipientName, String recipientPhone, String postalCode, String address, String detailAddress, String request, Boolean isDefaultedAddress, Member member) {
-        this.id = id;
+    public Address(String addressName, String recipientName, String recipientPhone, String postalCode, String address, String detailAddress, String request, Boolean isDefaultedAddress, Member member) {
         this.addressName = addressName;
         this.recipientName = recipientName;
         this.recipientPhone = recipientPhone;

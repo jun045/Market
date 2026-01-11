@@ -29,7 +29,7 @@ public class Cart extends BaseEntity {
     @Builder
     public Cart(Member member, List<CartItem> cartItems) {
         this.member = member;
-        this.cartItems = cartItems;
+        this.cartItems = (cartItems != null) ? cartItems : new ArrayList<>();
     }
 
     //최초 상품을 담을 때 장바구니 생성

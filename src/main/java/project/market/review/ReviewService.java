@@ -1,0 +1,108 @@
+package project.market.review;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import project.market.OrderItem.OrderItem;
+import project.market.OrderItem.OrderItemRepository;
+import project.market.PageResponse;
+import project.market.member.Entity.Member;
+import project.market.product.Product;
+import project.market.review.dto.DeleteReviewResponse;
+import project.market.review.dto.ReviewRequest;
+import project.market.review.dto.ReviewResponse;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ReviewService {
+
+    private final ReviewRepository reviewRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final QReviewRepository qReviewRepository;
+
+    //리뷰 생성
+    public ReviewResponse create (Member member, Long orderItemId, ReviewRequest request){
+
+        OrderItem orderItem = orderItemRepository.findById(orderItemId).orElseThrow(
+                () -> new IllegalArgumentException("해당 상품의 주문을 찾을 수 없습니다.")
+        );
+
+        //리뷰 작성 가능 상태 검증
+        orderItem.validateReviewable(member);
+
+        Product product = orderItem.getProductVariant().getProduct();
+
+        //리뷰 생성
+        Review review = Review.createReview(member, product, orderItem, request.rating(), request.content());
+
+        //리뷰 작성 완료 표기
+        orderItem.markReviewed();
+        reviewRepository.save(review);
+
+        return ReviewResponse.from(review);
+
+    }
+
+    //리뷰 수정
+    @Transactional
+    public ReviewResponse update (Member member, Long reviewId, ReviewRequest request){
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
+        );
+
+        //리뷰 작성자 검증
+        review.validateReviewOwner(member);
+
+        //리뷰 수정
+        review.updateReview(request.rating(), request.content());
+
+        return ReviewResponse.from(review);
+    }
+
+    @Transactional
+    public DeleteReviewResponse delete (Member member, Long reviewId){
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
+        );
+
+        //리뷰 작성자 검증
+        review.validateReviewOwner(member);
+
+        //리뷰 삭제
+        review.softDelete();
+        review.getOrderItem().unMarkReviewed();
+
+        return DeleteReviewResponse.from(review);
+    }
+
+    //관리자 리뷰 삭제
+    @Transactional
+    public DeleteReviewResponse adminDelete (Member member, Long reviewId){
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
+        );
+
+        review.softDelete();  //isReviewed = true 상태 유지. 관리자 권한 삭제시 사용자는 리뷰를 재작성 할 수 없음
+
+        return DeleteReviewResponse.from(review);
+    }
+
+    public PageResponse<ReviewResponse> getAll (Long productId, Pageable pageable){
+
+        Page<Review> reviewsAndPaging = qReviewRepository.getReviewsAndPaging(productId, pageable);
+        long totalReviews = reviewsAndPaging.getTotalElements();
+
+        List<Review> reviews = reviewsAndPaging.getContent();
+
+        List<ReviewResponse> reviewResponses = ReviewResponse.fromList(reviews);
+
+        return PageResponse.of(reviewResponses, totalReviews, pageable);
+    }
+}

@@ -76,7 +76,7 @@ public class OptionTest {
         categoryRepository.save(new Category("카테고리1", null));
 
         Member admin = dataSeeder.createAdmin();
-        adminToken = jwtProvider.createToken(admin.getId(), Role.SELLER);
+        adminToken = jwtProvider.createToken(admin.getId(), admin.getRole());
     }
 
     @DisplayName("옵션 생성")

@@ -1,6 +1,6 @@
 package project.market.PurchaseOrder;
 
-import org.springframework.stereotype.Component;
+
 import project.market.OrderItem.dto.OrderItemDetailResponse;
 import project.market.PurchaseOrder.dto.OrderDetailResponse;
 import project.market.PurchaseOrder.dto.OrderListResponse;
@@ -17,6 +17,7 @@ public class OrderMapper {
                                                        List<OrderItemDetailResponse> items) {
         return new OrderDetailResponse(
                 order.getId(),
+                order.getMerchantUid(),
                 order.getOrderStatus(),
                 order.getOrderDate(),
                 order.getOrderTotalPrice(),

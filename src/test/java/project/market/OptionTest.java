@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -174,7 +175,7 @@ public class OptionTest {
                 .statusCode(200);
 
         // 3. 구매자용 전체조회
-        List<UserVariantResponse> variants = RestAssured
+        Response response = RestAssured
                 .given().log().all()
                 .pathParam("productId", productId)
                 .when()
@@ -182,6 +183,13 @@ public class OptionTest {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
+                .response();
+
+        // 조회 Query, 응답시간
+        PerfMetrics metrics = PerfMetrics.from(response);
+        System.out.println(metrics.format());
+
+        List<UserVariantResponse> variants = response
                 .jsonPath()
                 .getList(".", UserVariantResponse.class);
 
@@ -235,7 +243,7 @@ public class OptionTest {
                 .statusCode(200);
 
         // 3. 관리자용 전체조회
-        List<AdminVariantResponse> variants = RestAssured
+        Response response = RestAssured
                 .given().log().all()
                 .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
@@ -244,6 +252,12 @@ public class OptionTest {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
+                .response();
+
+        // 조회 Query, 응답시간
+        logPerfMetric(response);
+
+        List<AdminVariantResponse> variants = response
                 .jsonPath()
                 .getList(".", AdminVariantResponse.class);
 
@@ -302,7 +316,7 @@ public class OptionTest {
         Long variantId = variant.id();
 
         //상세조회
-        AdminVariantResponse detail = RestAssured
+        Response response = RestAssured
                 .given().log().all()
                 .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
@@ -312,6 +326,12 @@ public class OptionTest {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
+                .response();
+
+        // 조회 Query, 응답시간
+        logPerfMetric(response);
+
+        AdminVariantResponse detail = response
                 .as(AdminVariantResponse.class);
 
         assertThat(detail).isNotNull();
@@ -459,5 +479,11 @@ public class OptionTest {
                 .delete("/admin/products/{productId}/variants/{variantId}")
                 .then().log().all()
                 .statusCode(204);
+    }
+
+
+    private void logPerfMetric (Response res){
+        PerfMetrics metrics = PerfMetrics.from(res);
+        System.out.println(metrics.format());
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -256,7 +257,7 @@ public class CartTest extends AcceptanceTest{
         CartItemResponse cartItemResponse3 = createCartItem(productId, variantId3, 3);
         CartItemResponse cartItemResponse4 = createCartItem(productId, variantId4, 4);
 
-        RestAssured
+        Response response = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + userToken1)
@@ -265,7 +266,10 @@ public class CartTest extends AcceptanceTest{
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(CartResponse.class);
+                .response();
+
+        // 조회 Query, 응답시간
+        logPerfMetric(response);
 
     }
 
@@ -338,5 +342,10 @@ public class CartTest extends AcceptanceTest{
                 .statusCode(200)
                 .extract()
                 .as(CartItemResponse.class);
+    }
+
+    private void logPerfMetric (Response res){
+        PerfMetrics metrics = PerfMetrics.from(res);
+        System.out.println(metrics.format());
     }
 }

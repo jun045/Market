@@ -14,5 +14,7 @@ public record PaymentVerifyResponse(boolean success,
                                     PayStatus payStatus,
                                     LocalDateTime paidAt,
                                     String buyerName,
-                                    String buyerEmail) {
+                                    String buyerEmail,
+                                    String paidMethod,
+                                    String pgProvider) {
 }

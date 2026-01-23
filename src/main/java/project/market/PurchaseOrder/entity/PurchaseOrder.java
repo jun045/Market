@@ -168,6 +168,7 @@ public class PurchaseOrder extends BaseEntity {
                 .mapToInt(OrderItem::getTotalPrice)
                 .sum();
         this.payAmount = Math.max(orderTotalPrice - usedPoint, 0);
+        this.earnPoint = (int)(this.payAmount * 0.01);
     }
 
     //결제 완료 처리

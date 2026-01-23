@@ -6,6 +6,7 @@ import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import project.market.Cate.Category;
 import project.market.DataSeeder;
 import project.market.DatabaseCleanup;
 import project.market.OrderItem.dto.CreateOrderItemRequest;
+import project.market.PerfMetrics;
 import project.market.ProductVariant.ProductVariant;
 import project.market.PurchaseOrder.dto.CreateOrderRequest;
 import project.market.PurchaseOrder.dto.OrderDetailResponse;
@@ -236,13 +238,18 @@ public class PaymentTest extends AcceptanceTest {
         //결제 후처리
         confirmPayment();
 
-        RestAssured.given().log().all()
+        Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + userToken)
                 .when()
                 .get("/api/v1/me/payments/all")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(200)
+                .extract()
+                .response();
+
+        // 조회 Query, 응답시간
+        logPerfMetric(response);
 
     }
 
@@ -335,6 +342,12 @@ public class PaymentTest extends AcceptanceTest {
                 .statusCode(200)
                 .extract()
                 .as(PaymentConfirmResponse.class);
+    }
+
+    //쿼리 측정
+    private void logPerfMetric (Response res){
+        PerfMetrics metrics = PerfMetrics.from(res);
+        System.out.println(metrics.format());
     }
 
 

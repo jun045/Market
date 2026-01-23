@@ -32,6 +32,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation 'io.rest-assured:rest-assured:5.4.0'
 	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+	runtimeOnly 'org.postgresql:postgresql'
 
 	//QueryDSL
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
@@ -58,6 +59,9 @@ dependencies {
 	dependencies {
 		implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
 	}
+
+	//테스트 쿼리 측정
+	implementation "net.ttddyy:datasource-proxy:1.10"
 
 }
 

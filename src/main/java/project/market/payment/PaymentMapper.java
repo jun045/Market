@@ -31,6 +31,8 @@ public class PaymentMapper {
                 .buyerEmail(pgResponse.getResponse().getBuyerEmail())
                 .payStatus(payment.getPayStatus())
                 .paidAt(payment.getPaidAt())
+                .paidMethod(pgResponse.getResponse().getPayMethod())
+                .pgProvider(payment.getPgProvider())
                 .build();
     }
 

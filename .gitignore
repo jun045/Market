@@ -38,3 +38,7 @@ out/
 
 application-local.properties
 .env
+
+# dummy data outputs
+data_seed/
+*.csv

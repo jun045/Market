@@ -3,6 +3,7 @@ package project.market;
 import com.siot.IamportRestClient.IamportClient;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -217,14 +218,18 @@ public class ReviewTest extends AcceptanceTest {
         ReviewResponse review = createReview();
 
 
-        RestAssured
+        Response response = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
                 .pathParam("productId", reviewedProductId)
                 .when()
                 .get("api/v1/products/{productId}/reviews")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(200)
+                .extract()
+                .response();
+
+        logPerfMetric(response);
     }
 
 
@@ -246,6 +251,9 @@ public class ReviewTest extends AcceptanceTest {
     }
 
 
-
+    private void logPerfMetric (Response res){
+        PerfMetrics metrics = PerfMetrics.from(res);
+        System.out.println(metrics.format());
+    }
 
 }

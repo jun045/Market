@@ -2,6 +2,7 @@ package project.market;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -140,13 +141,18 @@ public class AddressTest extends AcceptanceTest {
         createAddressId(new CreateAddressRequest(getMemberId("user1"), "유저1", "010-1234-5678", "코엑스", "06164", "서울시 강남구 삼성동", "영동대로 513", "없음", true));
 
 
-        RestAssured.given().log().all()
+        Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + getToken("user1"))
                 .when()
                 .get("api/v1/members/me/address")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(200)
+                .extract()
+                .response();
+
+        // 조회 Query, 응답시간
+        logPerfMetric(response);
     }
 
     @Test
@@ -304,5 +310,11 @@ public class AddressTest extends AcceptanceTest {
                 .statusCode(200)
                 .extract()
                 .as(AddressResponse.class);
+    }
+
+
+    private void logPerfMetric (Response res){
+        PerfMetrics metrics = PerfMetrics.from(res);
+        System.out.println(metrics.format());
     }
 }

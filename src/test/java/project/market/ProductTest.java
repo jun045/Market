@@ -2,6 +2,7 @@ package project.market;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -166,7 +167,7 @@ public class ProductTest {
         assertThat(product1).isNotNull();
 
         //전체조회
-        List<ProductSearchResponse> products = RestAssured
+        Response response = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
                 .when()
@@ -174,6 +175,12 @@ public class ProductTest {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
+                .response();
+
+        // 조회 Query, 응답시간
+        logPerfMetric(response);
+
+        List<ProductSearchResponse> products = response
                 .jsonPath()
                 .getList(".", ProductSearchResponse.class);
 
@@ -208,7 +215,7 @@ public class ProductTest {
         assertThat(product1).isNotNull();
 
         //상세조회
-        ProductResponse detail = RestAssured
+        Response response = RestAssured
                 .given().log().all()
                 .pathParam("productId", product1.id())
                 .when()
@@ -216,6 +223,12 @@ public class ProductTest {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
+                .response();
+
+        // 조회 Query, 응답시간
+        logPerfMetric(response);
+
+        ProductResponse detail = response
                 .as(ProductResponse.class);
 
         assertThat(detail.id()).isEqualTo(product1.id());
@@ -254,6 +267,13 @@ public class ProductTest {
                 .delete("/products/{productId}")
                 .then().log().all()
                 .statusCode(204);
+    }
+
+
+
+    private void logPerfMetric (Response res){
+        PerfMetrics metrics = PerfMetrics.from(res);
+        System.out.println(metrics.format());
     }
 
 }

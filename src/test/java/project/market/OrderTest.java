@@ -17,15 +17,22 @@ import project.market.Brand.BrandRepository;
 import project.market.Cate.Category;
 import project.market.Cate.CategoryRepository;
 import project.market.OrderItem.dto.CreateOrderItemRequest;
+import project.market.OrderItem.dto.OrderItemDetailResponse;
+import project.market.ProductVariant.ProductVariant;
+import project.market.ProductVariant.VariantRepository;
 import project.market.ProductVariant.dto.AdminVariantResponse;
 import project.market.ProductVariant.dto.CreateVariantRequest;
+import project.market.PurchaseOrder.dto.CreateCartOrderRequest;
 import project.market.PurchaseOrder.dto.CreateOrderRequest;
 import project.market.PurchaseOrder.dto.OrderDetailResponse;
 import project.market.PurchaseOrder.dto.OrderListResponse;
 import project.market.auth.JwtProvider;
+import project.market.cart.entity.Cart;
+import project.market.cart.entity.CartItem;
 import project.market.cart.repository.CartItemRepository;
 import project.market.cart.repository.CartRepository;
 import project.market.member.Entity.Member;
+import project.market.member.MemberRepository;
 import project.market.member.enums.Role;
 import project.market.product.ProductRepository;
 import project.market.product.dto.CreateProductRequest;
@@ -52,6 +59,18 @@ public class OrderTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
+    @Autowired
+    private VariantRepository variantRepository;
 
     @Autowired
     private DataSeeder dataSeeder;
@@ -240,8 +259,8 @@ public class OrderTest {
 
         //여러 상품 주문
         List<CreateOrderItemRequest> orderItems = List.of(
-                new CreateOrderItemRequest(variant1.id(),2),
-                new CreateOrderItemRequest(variant2.id(),1)
+                new CreateOrderItemRequest(variant1.id(), 2),
+                new CreateOrderItemRequest(variant2.id(), 1)
         );
 
         OrderDetailResponse order = RestAssured
@@ -293,7 +312,7 @@ public class OrderTest {
                 .statusCode(200)
                 .extract()
                 .jsonPath()
-                .getList(".",OrderListResponse.class);
+                .getList(".", OrderListResponse.class);
 
         assertThat(orders).isNotEmpty();
         assertThat(orders.get(0).orderTotalPrice()).isEqualTo(10000);
@@ -301,7 +320,7 @@ public class OrderTest {
 
     @DisplayName("관리자용 주문 전체 조회")
     @Test
-    void 관리자_주문전체조회() throws JsonProcessingException{
+    void 관리자_주문전체조회() throws JsonProcessingException {
         //주문 생성
         CreateOrderItemRequest orderItemRequest = new CreateOrderItemRequest(testVariantId, 1);
 
@@ -412,5 +431,67 @@ public class OrderTest {
 
         assertThat(orderDetail).isNotNull();
         assertThat(orderDetail.id()).isEqualTo(orderId);
+    }
+
+    @DisplayName("장바구니 상품 주문 생성")
+    @Test
+    void 장바구니상품_주문생성() {
+        Member user = memberRepository.findByLoginId("userId1").orElseThrow();
+
+        //장바구니 생성
+        Cart cart = Cart.builder()
+                .member(user)
+                .build();
+
+        cartRepository.save(cart);
+
+        //옵션 다시 조회(영속성 확보)
+        ProductVariant variant1 = variantRepository.findById(testVariantId)
+                .orElseThrow(() -> new IllegalArgumentException("옵션 없음"));
+
+        //cartItem 2개 생성, 저장
+        CartItem item1 = CartItem.builder()
+                .cart(cart)
+                .product(variant1.getProduct())
+                .productVariant(variant1)
+                .quantity(1)
+                .build();
+        cart.addCart(item1);
+        cartItemRepository.save(item1);
+
+        CartItem item2 = CartItem.builder()
+                .cart(cart)
+                .product(variant1.getProduct())
+                .productVariant(variant1)
+                .quantity(2)
+                .build();
+        cart.addCart(item2);
+        cartItemRepository.save(item2);
+
+        List<Long> cartItemIds = List.of(item1.getId(), item2.getId());
+
+        //장바구니 주문
+        OrderDetailResponse order = RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .body(new CreateCartOrderRequest(cartItemIds))
+                .when()
+                .post("/api/v1/orders/cart")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(OrderDetailResponse.class);
+
+        assertThat(order).isNotNull();
+        assertThat(order.orderItems()).hasSize(1);
+        //옵션 같을때 합침
+        OrderItemDetailResponse item = order.orderItems().get(0);
+        assertThat(item.quantity()).isEqualTo(3);
+        assertThat(item.totalPrice()).isEqualTo(30000);
+
+        //장바구니에 남은 상품 검증
+        List<CartItem> remaining = cartItemRepository.findAllByCartId(cart.getId());
+        assertThat(remaining).hasSize(0);
     }
 }

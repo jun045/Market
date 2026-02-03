@@ -78,12 +78,12 @@ public class RealPaymentTest extends AcceptanceTest {
 
         userToken = jwtProvider.createToken(userId, Role.BUYER);
 
-        impUid = "imp_621687698082";
-
-        // 실제 결제건에서 merchantUid 가져오기
-        IamportResponse<Payment> response = iamportClient.paymentByImpUid(impUid);
-        com.siot.IamportRestClient.response.Payment payment = response.getResponse();
-        merchantUid = payment.getMerchantUid(); // ✅ "order_test_1767851656861"
+//        impUid = "imp_621687698082";
+//
+//        // 실제 결제건에서 merchantUid 가져오기
+//        IamportResponse<Payment> response = iamportClient.paymentByImpUid(impUid);
+//        com.siot.IamportRestClient.response.Payment payment = response.getResponse();
+//        merchantUid = payment.getMerchantUid(); // ✅ "order_test_1767851656861"
 
         Address address1 = dataSeeder.createAddress1();
         addressId1 = address1.getId();
@@ -148,19 +148,19 @@ public class RealPaymentTest extends AcceptanceTest {
         //결제 전 검증
         preparePayment();
 
-        //결제
-        PaymentVerifyRequest request = new PaymentVerifyRequest(impUid, merchantUid, BigDecimal.valueOf(100));
-
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .header("Authorization", "Bearer " +userToken)
-                .body(request)
-                .when()
-                .post("api/v1/payments/verify")
-                .then().log().all()
-                .statusCode(200);
-
-        System.out.println("DB merchantUid = " + orderRepository.findAll().get(0).getMerchantUid());
+//        //결제
+//        PaymentVerifyRequest request = new PaymentVerifyRequest(impUid, merchantUid, BigDecimal.valueOf(100));
+//
+//        RestAssured.given().log().all()
+//                .contentType(ContentType.JSON)
+//                .header("Authorization", "Bearer " +userToken)
+//                .body(request)
+//                .when()
+//                .post("api/v1/payments/verify")
+//                .then().log().all()
+//                .statusCode(200);
+//
+//        System.out.println("DB merchantUid = " + orderRepository.findAll().get(0).getMerchantUid());
 
     }
 

@@ -1,6 +1,8 @@
 package project.market.cart.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.market.cart.CartMapper;
 import project.market.cart.dto.CartItemResponse;
@@ -29,6 +31,7 @@ public class CartService {
         );
 
         Cart cart = cartRepository.findByMemberId(user.getId()).orElse(null);
+    private final CartItemQueryRepository cartItemQueryRepository;
 
         if(cart == null){
             return CartMapper.empty();
@@ -38,7 +41,10 @@ public class CartService {
             throw new IllegalArgumentException("자신의 장바구니만 조회 가능합니다");
         }
 
-        List<CartItem> cartItems = cartItemRepository.findAllByCartId(cart.getId());
+        //장바구니 상품 조회(페이지네이션 적용)
+        Page<CartItemRaw> cartItemRaw = cartItemQueryRepository.cartItemRawList(member.getId(), cartInfo.cartId(), pageable);
+        List<CartItemRaw> cartItems = cartItemRaw.getContent();
+        long totalElements = cartItemRaw.getTotalElements();
 
         List<CartItemResponse> cartItemResonseList = CartMapper.toCartItemResonseList(cartItems);
 

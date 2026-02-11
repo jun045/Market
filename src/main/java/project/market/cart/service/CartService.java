@@ -38,7 +38,8 @@ public class CartService {
         List<CartItemRaw> cartItems = cartItemRaw.getContent();
         long totalElements = cartItemRaw.getTotalElements();
 
-        List<CartItemResponse> cartItemResonseList = CartMapper.toCartItemResonseList(cartItems);
+        //장바구니 상품의 총액과 총수량 계산
+        CartTotalRaw cartTotalRaw = cartItemQueryRepository.cartTotals(cartInfo.cartId(), member.getId());
 
         return CartMapper.toCartResponse(cart, cartItemResonseList);
 

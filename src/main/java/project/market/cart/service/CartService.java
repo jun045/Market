@@ -4,15 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import project.market.cart.CartAssembler;
 import project.market.cart.CartMapper;
-import project.market.cart.dto.CartItemResponse;
-import project.market.cart.dto.CartResponse;
-import project.market.cart.entity.Cart;
-import project.market.cart.entity.CartItem;
-import project.market.cart.repository.CartItemRepository;
-import project.market.cart.repository.CartRepository;
+import project.market.cart.dto.*;
+import project.market.cart.repository.CartItemQueryRepository;
+import project.market.cart.repository.CartQueryRepository;
 import project.market.member.Entity.Member;
-import project.market.member.MemberRepository;
 
 import java.util.List;
 
@@ -22,10 +19,9 @@ public class CartService {
 
     private final CartQueryRepository cartQueryRepository;
     private final CartItemQueryRepository cartItemQueryRepository;
+    private final CartAssembler cartAssembler;
 
-        if(cart == null){
-            return CartMapper.empty();
-        }
+    public GetCartResponse getCart (Member member, Pageable pageable){
 
         //장바구니 조회(없으면 빈 장바구니 반환)
         CartRaw cartInfo = cartQueryRepository.cartInfo(member.getId());
@@ -41,7 +37,7 @@ public class CartService {
         //장바구니 상품의 총액과 총수량 계산
         CartTotalRaw cartTotalRaw = cartItemQueryRepository.cartTotals(cartInfo.cartId(), member.getId());
 
-        return CartMapper.toCartResponse(cart, cartItemResonseList);
+        return cartAssembler.toGetCartResponse(cartInfo, cartItems, cartTotalRaw, totalElements, pageable);
 
     }
 

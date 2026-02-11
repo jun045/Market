@@ -16,6 +16,7 @@ public class CartController {
 
     @GetMapping("me/carts")
     public CartResponse getCart (@AuthenticationPrincipal (expression = "member") Member member){
+    @GetMapping("api/v1/me/carts")
 
         return cartService.getCart(member);
     }

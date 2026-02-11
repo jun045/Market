@@ -303,7 +303,7 @@ public class OrderTest {
                 .as(OrderDetailResponse.class);
 
         //조회
-        List<OrderListResponse> orders = RestAssured
+        Response response = RestAssured
                 .given().log().all()
                 .header("Authorization", "Bearer " + userToken)
                 .when()
@@ -311,6 +311,11 @@ public class OrderTest {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
+                .response();
+
+        logPerfMetric(response);
+
+        List<OrderListResponse> orders = response
                 .jsonPath()
                 .getList(".", OrderListResponse.class);
 
@@ -339,7 +344,7 @@ public class OrderTest {
                 .as(OrderDetailResponse.class);
 
         //조회
-        List<OrderListResponse> orders = RestAssured
+        Response response = RestAssured
                 .given().log().all()
                 .header("Authorization", "Bearer " + adminToken)
                 .when()
@@ -347,6 +352,11 @@ public class OrderTest {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
+                .response();
+
+        logPerfMetric(response);
+
+        List<OrderListResponse> orders = response
                 .jsonPath()
                 .getList(".", OrderListResponse.class);
 
@@ -379,7 +389,7 @@ public class OrderTest {
         Long orderId = order.id();
 
         //주문 상세 조회
-        OrderDetailResponse orderDetail = RestAssured
+        Response response = RestAssured
                 .given().log().all()
                 .header("Authorization", "Bearer " + userToken)
                 .pathParam("orderId", orderId)
@@ -388,6 +398,11 @@ public class OrderTest {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
+                .response();
+
+        logPerfMetric(response);
+
+        OrderDetailResponse orderDetail = response
                 .as(OrderDetailResponse.class);
 
         assertThat(orderDetail).isNotNull();
@@ -418,7 +433,7 @@ public class OrderTest {
 
         Long orderId = order.id();
 
-        OrderDetailResponse orderDetail = RestAssured
+        Response response = RestAssured
                 .given().log().all()
                 .header("Authorization", "Bearer " + adminToken)
                 .pathParam("orderId", orderId)
@@ -427,6 +442,12 @@ public class OrderTest {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
+                .response();
+
+        // 조회 Query, 응답시간
+        logPerfMetric(response);
+
+        OrderDetailResponse orderDetail = response
                 .as(OrderDetailResponse.class);
 
         assertThat(orderDetail).isNotNull();
@@ -493,5 +514,12 @@ public class OrderTest {
         //장바구니에 남은 상품 검증
         List<CartItem> remaining = cartItemRepository.findAllByCartId(cart.getId());
         assertThat(remaining).hasSize(0);
+    }
+
+
+
+    private void logPerfMetric (Response res){
+        PerfMetrics metrics = PerfMetrics.from(res);
+        System.out.println(metrics.format());
     }
 }

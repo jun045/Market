@@ -20,25 +20,17 @@ import java.util.List;
 @Service
 public class CartService {
 
-    private final CartRepository cartRepository;
-    private final MemberRepository memberRepository;
-    private final CartItemRepository cartItemRepository;
-
-    public CartResponse getCart (Member member){
-
-        Member user = memberRepository.findById(member.getId()).orElseThrow(
-                () -> new IllegalArgumentException("로그인이 필요합니다")
-        );
-
-        Cart cart = cartRepository.findByMemberId(user.getId()).orElse(null);
+    private final CartQueryRepository cartQueryRepository;
     private final CartItemQueryRepository cartItemQueryRepository;
 
         if(cart == null){
             return CartMapper.empty();
         }
 
-        if(!cart.getMember().getId().equals(user.getId())){
-            throw new IllegalArgumentException("자신의 장바구니만 조회 가능합니다");
+        //장바구니 조회(없으면 빈 장바구니 반환)
+        CartRaw cartInfo = cartQueryRepository.cartInfo(member.getId());
+        if(cartInfo == null){
+            return CartMapper.empty(pageable);
         }
 
         //장바구니 상품 조회(페이지네이션 적용)

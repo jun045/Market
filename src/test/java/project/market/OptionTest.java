@@ -96,7 +96,7 @@ public class OptionTest {
                         10000
                 ))
                 .when()
-                .post("/products/register") //POST
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -123,7 +123,7 @@ public class OptionTest {
                         null
                 ))
                 .when()
-                .post("/admin/products/{productId}/variants")
+                .post("/api/v1/admin/products/{productId}/variants")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -149,7 +149,7 @@ public class OptionTest {
                         10000
                 ))
                 .when()
-                .post("/products/register") //POST
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -170,7 +170,7 @@ public class OptionTest {
                 .contentType(ContentType.JSON)
                 .body(new CreateVariantRequest(optionsJson, 10, 0, null))
                 .when()
-                .post("/admin/products/{productId}/variants")
+                .post("/api/v1/admin/products/{productId}/variants")
                 .then().log().all()
                 .statusCode(200);
 
@@ -179,7 +179,7 @@ public class OptionTest {
                 .given().log().all()
                 .pathParam("productId", productId)
                 .when()
-                .get("/products/{productId}/variants")
+                .get("/api/v1/products/{productId}/variants")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -213,7 +213,7 @@ public class OptionTest {
                         10000
                 ))
                 .when()
-                .post("/products/register") //POST
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -238,7 +238,7 @@ public class OptionTest {
                         1000,
                         null))
                 .when()
-                .post("/admin/products/{productId}/variants")
+                .post("/api/v1/admin/products/{productId}/variants")
                 .then().log().all()
                 .statusCode(200);
 
@@ -248,7 +248,7 @@ public class OptionTest {
                 .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", productId)
                 .when()
-                .get("/admin/products/{productId}/variants")
+                .get("/api/v1/admin/products/{productId}/variants")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -281,7 +281,7 @@ public class OptionTest {
                         10000
                 ))
                 .when()
-                .post("/products/register") //POST
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -307,7 +307,7 @@ public class OptionTest {
                         null
                 ))
                 .when()
-                .post("/admin/products/{productId}/variants")
+                .post("/api/v1/admin/products/{productId}/variants")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -322,7 +322,7 @@ public class OptionTest {
                 .pathParam("productId", productId)
                 .pathParam("variantId", variantId)
                 .when()
-                .get("/admin/products/{productId}/variants/{variantId}")
+                .get("/api/v1/admin/products/{productId}/variants/{variantId}")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -354,7 +354,7 @@ public class OptionTest {
                         10000
                 ))
                 .when()
-                .post("/products/register") //POST
+                .post("/api/v1/admin/products") //POST
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -380,7 +380,7 @@ public class OptionTest {
                         null
                 ))
                 .when()
-                .post("/admin/products/{productId}/variants")
+                .post("/api/v1/admin/products/{productId}/variants")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -406,7 +406,7 @@ public class OptionTest {
                         5000,
                         null))
                 .when()
-                .put("/admin/products/{productId}/variants/{variantId}")
+                .put("/api/v1/admin/products/{productId}/variants/{variantId}")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -434,7 +434,7 @@ public class OptionTest {
                         10000
                 ))
                 .when()
-                .post("/products/register") //POST
+                .post("/api/v1/admin/products") //POST
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -460,7 +460,7 @@ public class OptionTest {
                         null
                 ))
                 .when()
-                .post("/admin/products/{productId}/variants")
+                .post("/api/v1/admin/products/{productId}/variants")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -476,7 +476,7 @@ public class OptionTest {
                 .pathParam("variantId", variantId)
                 .contentType(ContentType.JSON)
                 .when()
-                .delete("/admin/products/{productId}/variants/{variantId}")
+                .delete("/api/v1/admin/products/{productId}/variants/{variantId}")
                 .then().log().all()
                 .statusCode(204);
     }

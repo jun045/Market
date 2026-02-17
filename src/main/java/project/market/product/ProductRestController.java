@@ -13,19 +13,20 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/v1")
 public class ProductRestController {
 
     private final ProductService productService;
 
     //상품 등록
-    @PostMapping("/products/register")
+    @PostMapping("/admin/products")
     public ProductResponse register(@AuthenticationPrincipal (expression = "member") Member member,
                                     @RequestBody CreateProductRequest request) {
         return productService.create(member, request);
     }
 
     //상품 수정
-    @PutMapping("/products/{productId}")
+    @PutMapping("/admin/products/{productId}")
     public ProductResponse update(@AuthenticationPrincipal (expression = "member") Member member,
                                   @RequestBody CreateProductRequest request,
                                   @PathVariable Long productId) {
@@ -38,14 +39,14 @@ public class ProductRestController {
         return productService.findAll();
     }
 
-    //상세 조회 (가격 따로 분리?)
+    //상세 조회
     @GetMapping("/products/{productId}")
     public ProductResponse findProductDetail(@PathVariable Long productId) {
         return productService.findProduct(productId);
     }
 
     //상품 삭제
-    @DeleteMapping("/products/{productId}")
+    @DeleteMapping("/admin/products/{productId}")
     public ResponseEntity<Void> deleteProduct(@AuthenticationPrincipal (expression = "member") Member member,
                                               @PathVariable Long productId) {
         productService.delete(member, productId);

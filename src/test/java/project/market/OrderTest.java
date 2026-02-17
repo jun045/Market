@@ -113,7 +113,7 @@ public class OrderTest {
                         10000
                 ))
                 .when()
-                .post("/products/register") // POST /products/register 요청
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -138,7 +138,7 @@ public class OrderTest {
                         null
                 ))
                 .when()
-                .post("/admin/products/{productId}/variants")
+                .post("/api/v1/admin/products/{productId}/variants")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -188,7 +188,7 @@ public class OrderTest {
                         10000
                 ))
                 .when()
-                .post("products/register")
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -207,7 +207,7 @@ public class OrderTest {
                         20000
                 ))
                 .when()
-                .post("products/register")
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -229,7 +229,7 @@ public class OrderTest {
                         0,
                         null))
                 .when()
-                .post("/admin/products/{productId}/variants")
+                .post("/api/v1/admin/products/{productId}/variants")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -251,7 +251,7 @@ public class OrderTest {
                         1000,
                         null))
                 .when()
-                .post("/admin/products/{productId}/variants")
+                .post("/api/v1/admin/products/{productId}/variants")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

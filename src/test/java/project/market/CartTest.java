@@ -304,7 +304,7 @@ public class CartTest extends AcceptanceTest{
                 .header("Authorization", "Bearer " + adminToken)
                 .body(request)
                 .when()
-                .post("/products/register")
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -319,7 +319,7 @@ public class CartTest extends AcceptanceTest{
                 .pathParam("productId", productId)
                 .body(request)
                 .when()
-                .post("/admin/products/{productId}/variants")
+                .post("/api/v1/admin/products/{productId}/variants")
                 .then().log().all()
                 .extract()
                 .as(AdminVariantResponse.class);

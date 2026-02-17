@@ -31,13 +31,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/v1/admin/**").hasRole("SELLER")
-                        .requestMatchers("api/v1/members",
-                                "api/v1/members/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/products/**").permitAll()
-                        .requestMatchers("/api/v1/admin/**").permitAll() //나중에 hasRole로 바꾸기
-                        .requestMatchers("/api/v1/orders/**").permitAll() //나중에 hasRole로 바꾸기
+                        .requestMatchers("api/v1/members","api/v1/members/login").permitAll() //회원가입,로그인 누구나
+                        .requestMatchers(HttpMethod.GET, "api/v1/products/**").permitAll() //상품 조회 누구나
+                        .requestMatchers("/api/v1/admin/**").hasRole("SELLER") //관리자 전용
+                        .requestMatchers("/api/v1/orders/**").authenticated() //로그인한 사용자만 주문 가능
+                        //                        .requestMatchers("/api/v1/admin/**").permitAll() //나중에 hasRole로 바꾸기
+                        //                        .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 

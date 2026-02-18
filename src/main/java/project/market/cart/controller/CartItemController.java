@@ -13,25 +13,26 @@ import project.market.member.Entity.Member;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/v1")
 public class CartItemController {
 
     private final CartItemService cartItemService;
 
-    @PostMapping("me/cart/items")
+    @PostMapping("/me/cart/items")
     public CartItemResponse createCartItem (@AuthenticationPrincipal(expression = "member") Member member,
                                             @RequestBody CreateCartItemRequest request){
 
         return cartItemService.create(member, request);
     }
 
-    @PatchMapping("me/cart/items/{cartItemId}")
+    @PatchMapping("/me/cart/items/{cartItemId}")
     public CartItemResponse updateCartItem (@AuthenticationPrincipal (expression = "member") Member member,
                                             @PathVariable Long cartItemId,
                                             @RequestBody UpdateCartItemRequest request){
         return cartItemService.updateCartItem(member, cartItemId, request);
     }
 
-    @DeleteMapping("me/cart/items/{cartItemId}")
+    @DeleteMapping("/me/cart/items/{cartItemId}")
     public ResponseEntity<Void> deleteCartItem (@AuthenticationPrincipal (expression = "member") Member member,
                                                 @PathVariable Long cartItemId){
 

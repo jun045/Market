@@ -17,7 +17,7 @@ public class CartController {
 
     private final CartService cartService;
 
-    @GetMapping("api/v1/me/carts")
+    @GetMapping("/api/v1/me/carts")
     public GetCartResponse getCart (@AuthenticationPrincipal (expression = "member") Member member,
                                     @RequestParam(defaultValue = "1") int pageNumber,
                                     @RequestParam (defaultValue = "10") int size) {

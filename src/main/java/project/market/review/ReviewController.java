@@ -39,20 +39,22 @@ public class ReviewController {
         return reviewService.update(member, reviewId, request);
     }
 
+    //리뷰 삭제
     @DeleteMapping("/products/reviews/{reviewId}/delete")
     public DeleteReviewResponse deleteReview (@AuthenticationPrincipal (expression = "member") Member member,
                                               @PathVariable Long reviewId){
         return reviewService.delete(member, reviewId);
     }
 
+    //리뷰 삭제 - 관리자용
     @DeleteMapping("/admin/products/reviews/{reviewId}/delete")
-    @PreAuthorize("hasRole('SELLER')")
     public DeleteReviewResponse deleteForAdmin (@AuthenticationPrincipal (expression = "member") Member member,
                                                 @PathVariable Long reviewId){
 
         return reviewService.adminDelete(member, reviewId);
     }
 
+    //리뷰 목록 조회
     @GetMapping("/products/{productId}/reviews")
     public PageResponse<ReviewResponse> getAllReviews (@PathVariable Long productId,
                                                        @RequestParam (defaultValue = "1") int pageNumber,
@@ -61,6 +63,4 @@ public class ReviewController {
         Pageable pageable = PageRequest.of(pageNumber -1, size);
         return reviewService.getAll(productId, pageable);
     }
-
-
 }

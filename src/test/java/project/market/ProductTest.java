@@ -82,7 +82,7 @@ public class ProductTest {
                         10000
                 ))
                 .when()
-                .post("/products/register") // POST /products/register 요청
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -108,7 +108,7 @@ public class ProductTest {
                         10000
                 ))
                 .when()
-                .post("/products/register") // POST /products/register 요청
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -130,7 +130,7 @@ public class ProductTest {
                         11111
                 ))
                 .when()
-                .put("/products/{productId}")
+                .put("/api/v1/admin/products/{productId}")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -158,7 +158,7 @@ public class ProductTest {
                         10000
                 ))
                 .when()
-                .post("/products/register") // POST /products/register 요청
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -171,7 +171,7 @@ public class ProductTest {
                 .given().log().all()
                 .contentType(ContentType.JSON)
                 .when()
-                .get("/products")  // GET /products 요청
+                .get("/api/v1/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -206,7 +206,7 @@ public class ProductTest {
                         10000
                 ))
                 .when()
-                .post("/products/register") // POST /products/register 요청
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -219,7 +219,7 @@ public class ProductTest {
                 .given().log().all()
                 .pathParam("productId", product1.id())
                 .when()
-                .get("/products/{productId}") // 서버로 GET /products 요청
+                .get("/api/v1/products/{productId}")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -250,7 +250,7 @@ public class ProductTest {
                         10000
                 ))
                 .when()
-                .post("/products/register") // POST /products/register 요청
+                .post("/api/v1/admin/products")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -264,7 +264,7 @@ public class ProductTest {
                 .header("Authorization", "Bearer " + adminToken)
                 .pathParam("productId", product.id())
                 .when()
-                .delete("/products/{productId}")
+                .delete("api/v1/admin/products/{productId}")
                 .then().log().all()
                 .statusCode(204);
     }

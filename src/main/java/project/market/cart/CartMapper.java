@@ -30,42 +30,6 @@ public class CartMapper {
                 .build();
     }
 
-//    public static CartResponse toCartResponse (Cart cart, List<CartItemResponse> cartItemResponses){
-//
-//        long totalPrice = cartItemResponses.stream().mapToLong(
-//                CartItemResponse::itemPrice).sum();
-//
-//        int totalQuantity = cartItemResponses.stream().mapToInt(
-//                CartItemResponse::quantity).sum();
-//
-//        return CartResponse.builder()
-//                .cartId(cart.getId())
-//                .cartItemResponses(cartItemResponses)
-//                .totalPrice(totalPrice)
-//                .totalQuantity(totalQuantity)
-//                .updatedAt(cart.getUpdatedAt())
-//                .build();
-//    }
-//
-//    public static List<CartItemResponse> toCartItemResonseList (List<CartItem> cartItems){
-//
-//        return cartItems.stream().map(
-//                cartItem -> CartItemResponse.builder()
-//                        .id(cartItem.getId())
-//                        .productId(cartItem.getId())
-//                        .productName(cartItem.getProduct().getProductName())
-//                        .thumb(cartItem.getProduct().getThumbnail())
-//                        .variantId(cartItem.getProductVariant().getId())
-//                        .options(cartItem.getProductVariant().getOptions())
-//                        .quantity(cartItem.getQuantity())
-//                        .salePrice(cartItem.getProductVariant().calculateFinalPrice())
-//                        .itemPrice(cartItem.getQuantity()*cartItem.getProductVariant().calculateFinalPrice())
-//                        .createdAt(cartItem.getCreatedAt())
-//                        .updatedAt(cartItem.getUpdatedAt())
-//                        .build()
-//        ).toList();
-//    }
-
     public static List<CartItemResponse> toCartItemResponseList (List<CartItemRaw> cartItemRaw){
 
         return cartItemRaw.stream().map(
@@ -86,16 +50,6 @@ public class CartMapper {
     }
 
     public static CartResponse toCartResponse (CartRaw cartRaw, CartTotalRaw cartTotalRaw){
-//
-//        long totalPrice = cartItemResponses.stream().mapToLong(
-//                CartItemResponse::salePrice
-//        ).sum();
-//
-//        int totalQuantity = cartItemResponses.stream().mapToInt(
-//                CartItemResponse::quantity
-//        ).sum();
-
-
 
         return CartResponse.builder()
                 .cartId(cartRaw.cartId())

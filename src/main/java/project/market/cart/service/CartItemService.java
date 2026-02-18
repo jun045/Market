@@ -18,8 +18,6 @@ import project.market.member.MemberRepository;
 import project.market.product.Product;
 import project.market.product.ProductRepository;
 
-import java.util.Optional;
-
 @RequiredArgsConstructor
 @Service
 public class CartItemService {

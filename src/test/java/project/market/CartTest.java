@@ -17,10 +17,7 @@ import project.market.ProductVariant.VariantRepository;
 import project.market.ProductVariant.dto.AdminVariantResponse;
 import project.market.ProductVariant.dto.CreateVariantRequest;
 import project.market.auth.JwtProvider;
-import project.market.cart.dto.CartItemResponse;
-import project.market.cart.dto.CartResponse;
-import project.market.cart.dto.CreateCartItemRequest;
-import project.market.cart.dto.UpdateCartItemRequest;
+import project.market.cart.dto.*;
 import project.market.cart.repository.CartItemRepository;
 import project.market.cart.repository.CartRepository;
 import project.market.member.Entity.Member;
@@ -92,7 +89,7 @@ public class CartTest extends AcceptanceTest{
                 .header("Authorization", "Bearer " + userToken1)
                 .body(new CreateCartItemRequest(productId, variantId, 2))
                 .when()
-                .post("me/cart/items")
+                .post("api/v1/me/cart/items")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -123,7 +120,7 @@ public class CartTest extends AcceptanceTest{
                 .header("Authorization", "Bearer " + userToken1)
                 .body(new CreateCartItemRequest(productId, variantId, 2))
                 .when()
-                .post("me/cart/items")
+                .post("api/v1/me/cart/items")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -136,7 +133,7 @@ public class CartTest extends AcceptanceTest{
                 .header("Authorization", "Bearer " + userToken1)
                 .body(new CreateCartItemRequest(productId, variantId, 1))
                 .when()
-                .post("me/cart/items")
+                .post("api/v1/me/cart/items")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -174,7 +171,7 @@ public class CartTest extends AcceptanceTest{
                 .pathParam("cartItemId", cartItemId)
                 .body(new UpdateCartItemRequest(3))
                 .when()
-                .patch("me/cart/items/{cartItemId}")
+                .patch("/api/v1/me/cart/items/{cartItemId}")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -211,7 +208,7 @@ public class CartTest extends AcceptanceTest{
                 .header("Authorization", "Bearer " + userToken1)
                 .pathParam("cartItemId", cartItemId)
                 .when()
-                .delete("me/cart/items/{cartItemId}")
+                .delete("/api/v1/me/cart/items/{cartItemId}")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -262,7 +259,7 @@ public class CartTest extends AcceptanceTest{
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + userToken1)
                 .when()
-                .get("me/carts")
+                .get("/api/v1/me/carts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -278,22 +275,22 @@ public class CartTest extends AcceptanceTest{
     public void null테스트(){
 
         //최초 장바구니 아이템 담기 없이 장바구니 접근 -> 비어있는 장바구니 반환
-        CartResponse cartResponse = RestAssured
+        GetCartResponse cartResponse = RestAssured
                 .given().log().all()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + userToken1)
                 .when()
-                .get("me/carts")
+                .get("/api/v1/me/carts")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(CartResponse.class);
+                .as(GetCartResponse.class);
 
-        assertThat(cartResponse.cartItemResponses()).isEqualTo(List.of());
-        assertThat(cartResponse.cartId()).isNull();
-        assertThat(cartResponse.totalPrice()).isEqualTo(0);
-        assertThat(cartResponse.totalQuantity()).isEqualTo(0);
-        assertThat(cartResponse.updatedAt()).isNull();
+        assertThat(cartResponse.cartItems().getContent()).isEmpty();
+        assertThat(cartResponse.cartResponse().cartId()).isNull();
+        assertThat(cartResponse.cartResponse().totalPrice()).isEqualTo(0);
+        assertThat(cartResponse.cartResponse().totalQuantity()).isEqualTo(0);
+        assertThat(cartResponse.cartResponse().updatedAt()).isNull();
     }
 
 
@@ -337,7 +334,7 @@ public class CartTest extends AcceptanceTest{
                 .header("Authorization", "Bearer " + userToken1)
                 .body(new CreateCartItemRequest(productId, variantId, quantity))
                 .when()
-                .post("me/cart/items")
+                .post("/api/v1/me/cart/items")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

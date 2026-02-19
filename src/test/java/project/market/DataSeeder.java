@@ -10,6 +10,8 @@ import project.market.Cate.Category;
 import project.market.Cate.CategoryRepository;
 import project.market.OrderItem.OrderItem;
 import project.market.OrderItem.OrderItemRepository;
+import project.market.ParentCategory.ParentCategory;
+import project.market.ParentCategory.ParentCategoryRepository;
 import project.market.ProductVariant.ProductVariant;
 import project.market.ProductVariant.VariantRepository;
 import project.market.PurchaseOrder.OrderStatus;

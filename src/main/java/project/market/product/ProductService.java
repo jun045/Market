@@ -2,6 +2,8 @@ package project.market.product;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.market.Brand.BrandRepository;
 import project.market.member.Entity.Member;
@@ -19,6 +21,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
     private final MemberRepository memberRepository;
+    private final ProductQueryRepository productQueryRepository;
 
     //등록
     public ProductResponse create(Member member, CreateProductRequest request) {
@@ -85,14 +88,8 @@ public class ProductService {
     }
 
     //전체 목록 조회 (이름, 가격만)
-    public List<ProductSearchResponse> findAll() {
-        List<Product> products = productRepository.findAll();
-        return products.stream()
-                .map(p -> new ProductSearchResponse(
-                        p.getId(),
-                        p.getProductName(),
-                        p.getListPrice()
-                )).toList();
+    public Page<ProductSearchResponse> findAll(Pageable pageable) {
+        return productQueryRepository.findAllProducts(pageable);
     }
 
     //상세조회

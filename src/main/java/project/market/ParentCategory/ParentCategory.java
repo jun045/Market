@@ -1,4 +1,4 @@
-package project.market.product;
+package project.market.ParentCategory;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

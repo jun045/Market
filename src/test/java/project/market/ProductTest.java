@@ -182,12 +182,18 @@ public class ProductTest {
 
         List<ProductSearchResponse> products = response
                 .jsonPath()
-                .getList(".", ProductSearchResponse.class);
+                .getList("content", ProductSearchResponse.class);
+
+        int totalElements = response.jsonPath().getInt("totalElements");
+        int totalPages = response.jsonPath().getInt("totalPages");
+        int size = response.jsonPath().getInt("size");
 
         assertThat(products).isNotEmpty();
         assertThat(products).extracting("id").contains(product1.id());
-        assertThat(products).extracting("name").contains("상품이름1");
+        assertThat(products).extracting("productName").contains("상품이름1");
         assertThat(products).extracting("price").contains(10000);
+        assertThat(totalElements).isGreaterThan(0);
+        assertThat(size).isEqualTo(20);  // 기본값 20
     }
 
     @DisplayName("상품을 상세 조회한다")

@@ -16,9 +16,7 @@ public class Product extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //브랜드도 따로 분리해야 한 브랜드 상품 다 보기 가능
-    //private String brandName;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Brand brand;
 
     @NotNull
@@ -44,7 +42,7 @@ public class Product extends BaseEntity {
     private boolean isDeleted = false; //상품 삭제
 
     //카테고리:상품=1:n
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
 
     //좋아요 개수

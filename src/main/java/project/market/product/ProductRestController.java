@@ -1,6 +1,10 @@
 package project.market.product;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +39,8 @@ public class ProductRestController {
 
     //상품 전체 조회
     @GetMapping("/products")
-    public List<ProductSearchResponse> findAll() {
-        return productService.findAll();
+    public Page<ProductSearchResponse> findAll(@PageableDefault(size = 20) Pageable pageable) {
+        return productService.findAll(pageable);
     }
 
     //상세 조회

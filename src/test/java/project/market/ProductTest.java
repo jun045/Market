@@ -275,7 +275,59 @@ public class ProductTest {
                 .statusCode(204);
     }
 
+    @DisplayName("전체조회 페이징")
+    @Test
+    void 전체조회_페이징() {
+        //given : 상품 25개 생성
+        for (int i = 0; i < 25; i++) {
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("Authorization", "Bearer " + adminToken)
+                    .body(new CreateProductRequest(
+                            "상품"+ i,
+                            "상품설명" +i,
+                            "상품썸네일" +i,
+                            "상품상세"+i,
+                            10000+i
+                    ))
+                    .when()
+                    .post("/api/v1/admin/products")
+                    .then().log().all()
+                    .statusCode(200);
+        }
+        //when :  첫페이지 조회 ( 기본값 size = 20)
+        Response response = RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParam("page",0)
+                .queryParam("size", 20)
+                .when()
+                .get("/api/v1/products")
+                .then().log().all()
+                .extract()
+                .response();
 
+        //then
+        List<ProductSearchResponse> products = response
+                .jsonPath()
+                .getList("content", ProductSearchResponse.class);
+
+        int totalElements = response.jsonPath().getInt("totalElements");
+        int totalPages = response.jsonPath().getInt("totalPages");
+        int size = response.jsonPath().getInt("size");
+        int numberOfElements = response.jsonPath().getInt("numberOfElements");
+
+        assertThat(products).hasSize(20);  // 첫 페이지는 20개
+        assertThat(totalElements).isGreaterThanOrEqualTo(25);  // 전체 25개 이상
+        assertThat(totalPages).isGreaterThanOrEqualTo(2);  // 최소 2페이지
+        assertThat(size).isEqualTo(20);  // 페이지 크기 20
+        assertThat(numberOfElements).isEqualTo(20);  // 실제 반환된 개수 20
+
+        assertThat(products.get(0).id()).isNotNull();
+        assertThat(products.get(0).productName()).isNotNull();
+        assertThat(products.get(0).price()).isGreaterThan(0);
+    }
 
     private void logPerfMetric (Response res){
         PerfMetrics metrics = PerfMetrics.from(res);

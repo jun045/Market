@@ -171,12 +171,12 @@ public class PurchaseOrder extends BaseEntity {
         this.earnPoint = (int)(this.payAmount * 0.01);
     }
 
-    //결제 완료 처리
-    public void markAsPaid() {
-        this.orderStatus = OrderStatus.PAID;
-        this.paidAt = LocalDateTime.now();
-        this.earnPoint = (int) (orderTotalPrice * 0.01); //결제 완료 시 1% 적립
-    }
+//    //결제 완료 처리
+//    public void markAsPaid() {
+//        this.orderStatus = OrderStatus.PAID;
+//        this.paidAt = LocalDateTime.now();
+//        this.earnPoint = (int) (orderTotalPrice * 0.01); //결제 완료 시 1% 적립
+//    }
 
     //주문 취소
     public void cancel() {

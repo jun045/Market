@@ -78,8 +78,6 @@ public class OrderItem extends BaseEntity {
         if (quantity <= 0) {
             throw new IllegalArgumentException("수량은 0보다 커야 합니다.");
         }
-        //재고 검사
-        variant.validateStockOrThrow(quantity);
 
         //단가 계산 + 검증
         long finalPriceLong = variant.calculateFinalPrice();

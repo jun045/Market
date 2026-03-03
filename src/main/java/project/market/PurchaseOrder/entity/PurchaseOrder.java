@@ -220,5 +220,7 @@ public class PurchaseOrder extends BaseEntity {
     //주문 상태 결제 완료 표기
     public void completePayment (){
         this.orderStatus = OrderStatus.PAID;
+        this.paidAt = LocalDateTime.now();
+        this.earnPoint = (int)(this.payAmount * 0.01);
     }
 }

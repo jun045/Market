@@ -133,7 +133,7 @@ public class OrderService {
     public List<OrderListResponse> adminFindAllOrder(Member member) {
         requireAdmin(member);
 
-        List<PurchaseOrder> purchaseOrders = orderRepository.findAll();
+        List<PurchaseOrder> purchaseOrders = orderRepository.findAllWithDetails();
 
         List<OrderListResponse> responses = purchaseOrders.stream()
                 .map(OrderMapper::toListResponse)
@@ -147,7 +147,7 @@ public class OrderService {
     public List<OrderListResponse> userFindAllOrder(Member member) {
         Member user = requireUser(member);
 
-        List<PurchaseOrder> orders = orderRepository.findByMemberId(user.getId());
+        List<PurchaseOrder> orders = orderRepository.findAllWithDetailsByMemberId(user.getId());
 
         return orders.stream()
                 .map(OrderMapper::toListResponse)

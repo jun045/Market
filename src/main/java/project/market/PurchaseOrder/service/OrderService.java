@@ -1,6 +1,8 @@
 package project.market.PurchaseOrder.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.market.OrderItem.OrderItem;
@@ -9,11 +11,13 @@ import project.market.OrderItem.dto.OrderItemDetailResponse;
 import project.market.ProductVariant.ProductVariant;
 import project.market.ProductVariant.VariantRepository;
 import project.market.PurchaseOrder.OrderMapper;
+import project.market.PurchaseOrder.OrderQueryRepository;
 import project.market.PurchaseOrder.OrderStatus;
 import project.market.PurchaseOrder.PurchaseOrderRepository;
 import project.market.PurchaseOrder.dto.CreateOrderRequest;
 import project.market.PurchaseOrder.dto.OrderDetailResponse;
 import project.market.PurchaseOrder.dto.OrderListResponse;
+import project.market.PurchaseOrder.dto.OrderSearchDto;
 import project.market.PurchaseOrder.entity.PurchaseOrder;
 import project.market.member.Entity.Member;
 import project.market.member.MemberRepository;
@@ -29,6 +33,7 @@ public class OrderService {
     private final PurchaseOrderRepository orderRepository;
     private final MemberRepository memberRepository;
     private final VariantRepository variantRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
     //권한 체크 메서드
     private Member requireUser(Member member) {
@@ -128,18 +133,27 @@ public class OrderService {
         return OrderMapper.toDetailResponse(order, itemDtos);
     }
 
-    //주문 전체 조회 - 관리자
-    @Transactional(readOnly = true)
-    public List<OrderListResponse> adminFindAllOrder(Member member) {
+    //    //주문 전체 조회 - 관리자
+//    @Transactional(readOnly = true)
+//    public List<OrderListResponse> adminFindAllOrder(Member member) {
+//        requireAdmin(member);
+//
+//        List<PurchaseOrder> purchaseOrders = orderRepository.findAllWithDetails();
+//
+//        List<OrderListResponse> responses = purchaseOrders.stream()
+//                .map(OrderMapper::toListResponse)
+//                .toList();
+//
+//        return responses;
+//    }
+
+    //전체 조회 + 검색 기능 - 관리자용
+    @Transactional
+    public Page<OrderListResponse> adminSearchOrders(Member member,
+                                                     OrderSearchDto dto,
+                                                     Pageable pageable) {
         requireAdmin(member);
-
-        List<PurchaseOrder> purchaseOrders = orderRepository.findAllWithDetails();
-
-        List<OrderListResponse> responses = purchaseOrders.stream()
-                .map(OrderMapper::toListResponse)
-                .toList();
-
-        return responses;
+        return orderQueryRepository.searchOrders(dto, pageable);
     }
 
     //주문 전체 조회 - 사용자
@@ -153,6 +167,7 @@ public class OrderService {
                 .map(OrderMapper::toListResponse)
                 .toList();
     }
+
 
     //주문 상세 조회 - 관리자
     @Transactional(readOnly = true)

@@ -1,14 +1,15 @@
 package project.market.PurchaseOrder.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import project.market.PurchaseOrder.OrderStatus;
-import project.market.PurchaseOrder.dto.CreateCartOrderRequest;
-import project.market.PurchaseOrder.dto.CreateOrderRequest;
-import project.market.PurchaseOrder.dto.OrderDetailResponse;
-import project.market.PurchaseOrder.dto.OrderListResponse;
+import project.market.PurchaseOrder.dto.*;
 import project.market.PurchaseOrder.service.CartOrderService;
 import project.market.PurchaseOrder.service.OrderService;
 import project.market.member.Entity.Member;
@@ -63,10 +64,19 @@ public class PurchaseOrderController {
     /**
      * 관리자
      **/
-    //전체 조회 - 관리자
+//    //전체 조회 - 관리자
+//    @GetMapping("/admin/orders")
+//    public List<OrderListResponse> adminFindAllOrder(@AuthenticationPrincipal(expression = "member") Member member) {
+//        return orderService.adminFindAllOrder(member);
+//    }
+
+    //전체 조회 + 검색 기능(주문번호, 이메일,기간,주문상태) - 관리자
     @GetMapping("/admin/orders")
-    public List<OrderListResponse> adminFindAllOrder(@AuthenticationPrincipal(expression = "member") Member member) {
-        return orderService.adminFindAllOrder(member);
+    public Page<OrderListResponse> adminFindAllOrder(
+            @AuthenticationPrincipal(expression = "member") Member member,
+            @ModelAttribute OrderSearchDto dto,
+            @PageableDefault(size = 20, sort = "orderDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        return orderService.adminSearchOrders(member, dto, pageable);
     }
 
     //상세 조회 - 관리자

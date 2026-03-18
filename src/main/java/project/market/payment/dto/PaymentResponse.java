@@ -2,6 +2,7 @@ package project.market.payment.dto;
 
 import lombok.Builder;
 import project.market.PurchaseOrder.entity.PayStatus;
+import project.market.payment.Payment;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,19 +19,19 @@ public record PaymentResponse(String impUid,
                               PayStatus payStatus,
                               LocalDateTime paidAt) {
 
-    public static PaymentResponse from (PaymentRaw raw){
+    public static PaymentResponse from (Payment payment){
 
         return PaymentResponse.builder()
-                .impUid(raw.impUid())
-                .merchantUid(raw.merchantUid())
-                .ordersId(raw.purchaseOrderId())
-                .pgProvider(raw.pgProvider())
-                .finalOrdersAmount(raw.finalPayAmount())
-                .amount(raw.amount())
-                .usedPoint(raw.usedPoint())
-                .earnPoint(raw.earnedPoint())
-                .payStatus(raw.payStatus())
-                .paidAt(raw.paidAt())
+                .impUid(payment.getImpUid())
+                .merchantUid(payment.getMerchantUid())
+                .ordersId(payment.getPurchaseOrder().getId())
+                .pgProvider(payment.getPgProvider())
+                .finalOrdersAmount(payment.getPurchaseOrder().getPayAmount())
+                .amount(payment.getAmount())
+                .usedPoint(payment.getPurchaseOrder().getUsedPoint())
+                .earnPoint(payment.getPurchaseOrder().getEarnPoint())
+                .payStatus(payment.getPayStatus())
+                .paidAt(payment.getPaidAt())
                 .build();
     }
 }

@@ -1,6 +1,5 @@
 package project.market.payment;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +8,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import project.market.PurchaseOrder.entity.PayStatus;
-import project.market.PurchaseOrder.entity.QPurchaseOrder;
-import project.market.payment.dto.PaymentRaw;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,27 +18,14 @@ public class QPaymentRepository {
 
     private final JPAQueryFactory queryFactory;
     private final QPayment qPayment = QPayment.payment;
-    private final QPurchaseOrder qPurchaseOrder = QPurchaseOrder.purchaseOrder;
 
-    public Page<PaymentRaw> getAllPaymentsAndPaging (Long memberId, Pageable pageable){
+    public Page<Payment> getAllPaymentsAndPaging (Long memberId, Pageable pageable){
 
         int size = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
 
-        List<PaymentRaw> payments = queryFactory
-                .select(Projections.constructor(PaymentRaw.class,
-                        qPayment.impUid,
-                        qPayment.merchantUid,
-                        qPurchaseOrder.id,
-                        qPayment.pgProvider,
-                        qPurchaseOrder.payAmount,
-                        qPayment.amount,
-                        qPurchaseOrder.usedPoint,
-                        qPurchaseOrder.earnPoint,
-                        qPayment.payStatus,
-                        qPayment.paidAt))
-                .from(qPayment)
-                .join(qPayment.purchaseOrder, qPurchaseOrder)
+        List<Payment> payments = queryFactory
+                .selectFrom(qPayment)
                 .where(memberIdEq(memberId),
                         paymentTermCondition(),
                         paymentStatusCondition())

@@ -41,8 +41,7 @@ public class OrderItem extends BaseEntity {
     @Builder
     public OrderItem(ProductVariant productVariant,
                      int quantity,
-                     int unitPrice,
-                     Boolean isReviewed
+                     int unitPrice
     ) {
         this.productVariant = Objects.requireNonNull(productVariant, "productVariant required");
 
@@ -154,6 +153,7 @@ public class OrderItem extends BaseEntity {
         }
     }
 
+    //TODO 메서드 하나로 합치고 Boolean을 Enum으로 변경
     //리뷰 작성 완료 표시 - 사용 위치 ReviewService
     public void markReviewed (){
         if(isReviewed){

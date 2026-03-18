@@ -347,6 +347,8 @@ public class OrderTest {
         Response response = RestAssured
                 .given().log().all()
                 .header("Authorization", "Bearer " + adminToken)
+                .queryParam("page", 0)
+                .queryParam("size", 20)
                 .when()
                 .get("/api/v1/admin/orders")
                 .then().log().all()
@@ -358,7 +360,7 @@ public class OrderTest {
 
         List<OrderListResponse> orders = response
                 .jsonPath()
-                .getList(".", OrderListResponse.class);
+                .getList("content", OrderListResponse.class);
 
         assertThat(orders).isNotEmpty();
         assertThat(orders).hasSize(1);

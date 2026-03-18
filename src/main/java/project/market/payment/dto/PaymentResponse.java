@@ -2,7 +2,6 @@ package project.market.payment.dto;
 
 import lombok.Builder;
 import project.market.PurchaseOrder.entity.PayStatus;
-import project.market.payment.Payment;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

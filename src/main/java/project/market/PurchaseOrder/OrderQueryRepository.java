@@ -28,6 +28,7 @@ public class OrderQueryRepository {
                 .select(Projections.constructor(OrderListResponse.class,
                         purchaseOrder.id,
                         purchaseOrder.orderStatus,
+                        purchaseOrder.orderDate,
                         purchaseOrder.orderTotalPrice,
                         purchaseOrder.payAmount
                 ))

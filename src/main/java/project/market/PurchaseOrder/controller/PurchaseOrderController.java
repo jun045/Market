@@ -64,12 +64,6 @@ public class PurchaseOrderController {
     /**
      * 관리자
      **/
-//    //전체 조회 - 관리자
-//    @GetMapping("/admin/orders")
-//    public List<OrderListResponse> adminFindAllOrder(@AuthenticationPrincipal(expression = "member") Member member) {
-//        return orderService.adminFindAllOrder(member);
-//    }
-
     //전체 조회 + 검색 기능(주문번호, 이메일,기간,주문상태) - 관리자
     @GetMapping("/admin/orders")
     public Page<OrderListResponse> adminFindAllOrder(

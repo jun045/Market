@@ -133,21 +133,7 @@ public class OrderService {
         return OrderMapper.toDetailResponse(order, itemDtos);
     }
 
-    //    //주문 전체 조회 - 관리자
-//    @Transactional(readOnly = true)
-//    public List<OrderListResponse> adminFindAllOrder(Member member) {
-//        requireAdmin(member);
-//
-//        List<PurchaseOrder> purchaseOrders = orderRepository.findAllWithDetails();
-//
-//        List<OrderListResponse> responses = purchaseOrders.stream()
-//                .map(OrderMapper::toListResponse)
-//                .toList();
-//
-//        return responses;
-//    }
-
-    //전체 조회 + 검색 기능 - 관리자용
+    //주문 전체 조회 + 검색 기능 - 관리자용
     @Transactional
     public Page<OrderListResponse> adminSearchOrders(Member member,
                                                      OrderSearchDto dto,

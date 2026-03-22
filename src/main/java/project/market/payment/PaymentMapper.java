@@ -2,7 +2,10 @@ package project.market.payment;
 
 import com.siot.IamportRestClient.response.IamportResponse;
 import project.market.member.Entity.Member;
-import project.market.payment.dto.*;
+import project.market.payment.dto.PaymentConfirmResponse;
+import project.market.payment.dto.PaymentIntentResponse;
+import project.market.payment.dto.PaymentResponse;
+import project.market.payment.dto.PaymentVerifyResponse;
 
 import java.util.List;
 
@@ -57,7 +60,7 @@ public class PaymentMapper {
                 .build();
     }
 
-    public static List<PaymentResponse> toPaymentResponseList (List<PaymentRaw> payments){
+    public static List<PaymentResponse> toPaymentResponseList (List<Payment> payments){
 
         return payments.stream().map(PaymentResponse::from)
                 .toList();

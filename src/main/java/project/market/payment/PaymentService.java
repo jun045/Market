@@ -190,10 +190,10 @@ public class PaymentService {
     //결제 내역 조회(1년 치)
     public PageResponse<PaymentResponse> getAllPayment (Member member, Pageable pageable){
 
-        Page<PaymentRaw> allPaymentsAndPaging = qPaymentRepository.getAllPaymentsAndPaging(member.getId(), pageable);
+        Page<Payment> paymentsAndPaging = qPaymentRepository.getAllPaymentsAndPaging(member.getId(), pageable);
 
-        long totalElements = allPaymentsAndPaging.getTotalElements();
-        List<PaymentRaw> payments = allPaymentsAndPaging.getContent();
+        long totalElements = paymentsAndPaging.getTotalElements();
+        List<Payment> payments = paymentsAndPaging.getContent();
 
         List<PaymentResponse> paymentResponseList = PaymentMapper.toPaymentResponseList(payments);
 

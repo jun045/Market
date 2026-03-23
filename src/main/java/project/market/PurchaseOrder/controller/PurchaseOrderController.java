@@ -14,6 +14,7 @@ import project.market.PurchaseOrder.service.CartOrderService;
 import project.market.PurchaseOrder.service.OrderService;
 import project.market.member.Entity.Member;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -35,8 +36,13 @@ public class PurchaseOrderController {
 
     //전체 조회 - 사용자
     @GetMapping("/orders")
-    public List<OrderListResponse> userFindAllOrder(@AuthenticationPrincipal(expression = "member") Member member) {
-        return orderService.userFindAllOrder(member);
+    public Page<OrderListResponse> userFindAllOrder(@AuthenticationPrincipal(expression = "member") Member member,
+                                                    @RequestParam(required = false) String merchantUid,
+                                                    @RequestParam(required = false) LocalDateTime startDate,
+                                                    @RequestParam(required = false) LocalDateTime endDate,
+                                                    @PageableDefault(size = 20) Pageable pageable) {
+        UserOrderSearchDto dto = new UserOrderSearchDto(merchantUid, startDate, endDate);
+        return orderService.userFindAllOrder(member, dto, pageable);
     }
 
     //상세 조회 - 사용자
@@ -68,8 +74,13 @@ public class PurchaseOrderController {
     @GetMapping("/admin/orders")
     public Page<OrderListResponse> adminFindAllOrder(
             @AuthenticationPrincipal(expression = "member") Member member,
-            @ModelAttribute OrderSearchDto dto,
-            @PageableDefault(size = 20, sort = "orderDate", direction = Sort.Direction.DESC) Pageable pageable) {
+            @RequestParam(required = false) String merchantUid,
+            @RequestParam(required = false) OrderStatus orderStatus,
+            @RequestParam(required = false) LocalDateTime startDate,
+            @RequestParam(required = false) LocalDateTime endDate,
+            @RequestParam(required = false) String memberEmail,
+            @PageableDefault(size = 20) Pageable pageable) {
+        OrderSearchDto dto = new OrderSearchDto(merchantUid, orderStatus, startDate, endDate, memberEmail);
         return orderService.adminSearchOrders(member, dto, pageable);
     }
 
@@ -91,9 +102,9 @@ public class PurchaseOrderController {
 
     //주문 취소 승인 - 관리자
     @PutMapping("/admin/orders/{orderId}/approve-cancel")
-    public ResponseEntity<Void> approveCancelRequest(@AuthenticationPrincipal(expression = "member")Member member,
-                                                     @PathVariable Long orderId){
-        orderService.approveCancelRequest(member,orderId);
+    public ResponseEntity<Void> approveCancelRequest(@AuthenticationPrincipal(expression = "member") Member member,
+                                                     @PathVariable Long orderId) {
+        orderService.approveCancelRequest(member, orderId);
         return ResponseEntity.ok().build();
     }
 

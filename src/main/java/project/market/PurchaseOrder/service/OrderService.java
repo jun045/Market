@@ -14,10 +14,7 @@ import project.market.PurchaseOrder.OrderMapper;
 import project.market.PurchaseOrder.OrderQueryRepository;
 import project.market.PurchaseOrder.OrderStatus;
 import project.market.PurchaseOrder.PurchaseOrderRepository;
-import project.market.PurchaseOrder.dto.CreateOrderRequest;
-import project.market.PurchaseOrder.dto.OrderDetailResponse;
-import project.market.PurchaseOrder.dto.OrderListResponse;
-import project.market.PurchaseOrder.dto.OrderSearchDto;
+import project.market.PurchaseOrder.dto.*;
 import project.market.PurchaseOrder.entity.PurchaseOrder;
 import project.market.member.Entity.Member;
 import project.market.member.MemberRepository;
@@ -144,14 +141,11 @@ public class OrderService {
 
     //주문 전체 조회 - 사용자
     @Transactional(readOnly = true)
-    public List<OrderListResponse> userFindAllOrder(Member member) {
+    public Page<OrderListResponse> userFindAllOrder(Member member,
+                                                    UserOrderSearchDto dto,
+                                                    Pageable pageable) {
         Member user = requireUser(member);
-
-        List<PurchaseOrder> orders = orderRepository.findAllWithDetailsByMemberId(user.getId());
-
-        return orders.stream()
-                .map(OrderMapper::toListResponse)
-                .toList();
+        return orderQueryRepository.searchUserOrders(user.getId(), dto, pageable);
     }
 
 
@@ -160,7 +154,7 @@ public class OrderService {
     public OrderDetailResponse adminFindOrder(Member member, Long orderId) {
         requireAdmin(member);
 
-        PurchaseOrder order = orderRepository.findById(orderId)
+        PurchaseOrder order = orderQueryRepository.findOrderDetail(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("주문 찾을 수 없음"));
 
         List<OrderItemDetailResponse> itemDtos = order.getOrderItems().stream()
@@ -173,7 +167,12 @@ public class OrderService {
     //주문 상세 조회 - 사용자
     @Transactional(readOnly = true)
     public OrderDetailResponse userFindOrder(Member member, Long orderId) {
-        PurchaseOrder order = requireUserOrder(member, orderId);
+        Member user = requireUser(member);
+
+        PurchaseOrder order = orderQueryRepository.findOrderDetail(orderId)
+                .orElseThrow(()-> new IllegalArgumentException("주문 찾울 수 없음"));
+
+        order.validateOwner(user);
 
         List<OrderItemDetailResponse> itemDtos = order.getOrderItems().stream()
                 .map(OrderItemMapper::toDetailResponse)

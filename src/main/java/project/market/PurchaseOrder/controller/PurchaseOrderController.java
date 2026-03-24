@@ -1,18 +1,20 @@
 package project.market.PurchaseOrder.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import project.market.PurchaseOrder.OrderStatus;
-import project.market.PurchaseOrder.dto.CreateCartOrderRequest;
-import project.market.PurchaseOrder.dto.CreateOrderRequest;
-import project.market.PurchaseOrder.dto.OrderDetailResponse;
-import project.market.PurchaseOrder.dto.OrderListResponse;
+import project.market.PurchaseOrder.dto.*;
 import project.market.PurchaseOrder.service.CartOrderService;
 import project.market.PurchaseOrder.service.OrderService;
 import project.market.member.Entity.Member;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -34,8 +36,13 @@ public class PurchaseOrderController {
 
     //전체 조회 - 사용자
     @GetMapping("/orders")
-    public List<OrderListResponse> userFindAllOrder(@AuthenticationPrincipal(expression = "member") Member member) {
-        return orderService.userFindAllOrder(member);
+    public Page<OrderListResponse> userFindAllOrder(@AuthenticationPrincipal(expression = "member") Member member,
+                                                    @RequestParam(required = false) String merchantUid,
+                                                    @RequestParam(required = false) LocalDateTime startDate,
+                                                    @RequestParam(required = false) LocalDateTime endDate,
+                                                    @PageableDefault(size = 20) Pageable pageable) {
+        UserOrderSearchDto dto = new UserOrderSearchDto(merchantUid, startDate, endDate);
+        return orderService.userFindAllOrder(member, dto, pageable);
     }
 
     //상세 조회 - 사용자
@@ -63,10 +70,18 @@ public class PurchaseOrderController {
     /**
      * 관리자
      **/
-    //전체 조회 - 관리자
+    //전체 조회 + 검색 기능(주문번호, 이메일,기간,주문상태) - 관리자
     @GetMapping("/admin/orders")
-    public List<OrderListResponse> adminFindAllOrder(@AuthenticationPrincipal(expression = "member") Member member) {
-        return orderService.adminFindAllOrder(member);
+    public Page<OrderListResponse> adminFindAllOrder(
+            @AuthenticationPrincipal(expression = "member") Member member,
+            @RequestParam(required = false) String merchantUid,
+            @RequestParam(required = false) OrderStatus orderStatus,
+            @RequestParam(required = false) LocalDateTime startDate,
+            @RequestParam(required = false) LocalDateTime endDate,
+            @RequestParam(required = false) String memberEmail,
+            @PageableDefault(size = 20) Pageable pageable) {
+        OrderSearchDto dto = new OrderSearchDto(merchantUid, orderStatus, startDate, endDate, memberEmail);
+        return orderService.adminSearchOrders(member, dto, pageable);
     }
 
     //상세 조회 - 관리자
@@ -87,9 +102,9 @@ public class PurchaseOrderController {
 
     //주문 취소 승인 - 관리자
     @PutMapping("/admin/orders/{orderId}/approve-cancel")
-    public ResponseEntity<Void> approveCancelRequest(@AuthenticationPrincipal(expression = "member")Member member,
-                                                     @PathVariable Long orderId){
-        orderService.approveCancelRequest(member,orderId);
+    public ResponseEntity<Void> approveCancelRequest(@AuthenticationPrincipal(expression = "member") Member member,
+                                                     @PathVariable Long orderId) {
+        orderService.approveCancelRequest(member, orderId);
         return ResponseEntity.ok().build();
     }
 

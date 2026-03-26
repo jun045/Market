@@ -56,8 +56,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	//flyway
-	implementation 'org.flywaydb:flyway-core'
-	implementation 'org.flywaydb:flyway-database-postgresql'
+	implementation 'org.flywaydb:flyway-core:10.20.1'           //버전 추가
+	implementation 'org.flywaydb:flyway-database-postgresql:10.20.1'
 
 	//아엠포트
 	dependencies {
@@ -71,4 +71,5 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	systemProperty 'spring.flyway.enabled', 'false'
 }

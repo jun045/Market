@@ -140,17 +140,6 @@ public class PurchaseOrder extends BaseEntity {
         return item;
     }
 
-    //여러 아이템 한번에 추가
-    public void addOrderItemsBatch(List<Pair<ProductVariant, Integer>> items) {
-        if (items == null || items.isEmpty()) {
-            throw new IllegalArgumentException("주문할 상품이 없습니다");
-        }
-        for (Pair<ProductVariant, Integer> entry : items) {
-            addOrderItem(entry.getFirst(), entry.getSecond());
-        }
-        recalculateOrderTotal(); // 마지막에 한 번만 호출
-    }
-
     //계산 오류 방지 및 도메인 일관성
     //상품 삭제
     public void removeOrderItem(OrderItem orderItem) {

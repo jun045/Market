@@ -11,6 +11,7 @@ import project.market.PageResponse;
 import project.market.member.Entity.Member;
 import project.market.product.Product;
 import project.market.review.dto.DeleteReviewResponse;
+import project.market.review.dto.ReviewRaw;
 import project.market.review.dto.ReviewRequest;
 import project.market.review.dto.ReviewResponse;
 
@@ -96,10 +97,10 @@ public class ReviewService {
 
     public PageResponse<ReviewResponse> getAll (Long productId, Pageable pageable){
 
-        Page<Review> reviewsAndPaging = qReviewRepository.getReviewsAndPaging(productId, pageable);
+        Page<ReviewRaw> reviewsAndPaging = qReviewRepository.getReviewsAndPaging(productId, pageable);
         long totalReviews = reviewsAndPaging.getTotalElements();
 
-        List<Review> reviews = reviewsAndPaging.getContent();
+        List<ReviewRaw> reviews = reviewsAndPaging.getContent();
 
         List<ReviewResponse> reviewResponses = ReviewResponse.fromList(reviews);
 

@@ -6,9 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import project.market.PageResponse;
 import project.market.member.Entity.Member;
+import project.market.product.dto.AdminProductSearchResponse;
 import project.market.product.dto.CreateProductRequest;
 import project.market.product.dto.ProductResponse;
 import project.market.product.dto.ProductSearchResponse;
@@ -41,6 +44,21 @@ public class ProductRestController {
     @GetMapping("/products")
     public Page<ProductSearchResponse> findAll(@PageableDefault(size = 20) Pageable pageable) {
         return productService.findAll(pageable);
+    }
+
+    //관리자용 상품 조회
+    @GetMapping("/admin/products")
+    @PreAuthorize("hasRole('SELLER')")
+    public PageResponse<AdminProductSearchResponse> adminFindAll (@AuthenticationPrincipal (expression = "member") Member member,
+                                                                  @RequestParam(required = false) Long categoryId,
+                                                                  @RequestParam(required = false) Long brandId,
+                                                                  @RequestParam(required = false) String brandName,
+                                                                  @RequestParam(required = false) String keyword,
+                                                                  @RequestParam(required = false) ProductStatus productStatus,
+                                                                  @RequestParam(required = false) Boolean isDeleted,
+                                                                  @PageableDefault(size = 20) Pageable pageable){
+        return productService.findAllForAdmin(member, categoryId, brandId, brandName, keyword, productStatus, isDeleted, pageable);
+
     }
 
     //상세 조회

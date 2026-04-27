@@ -43,7 +43,7 @@ public class OrderQueryRepository {
                 .from(purchaseOrder)
                 .leftJoin(purchaseOrder.member, member)
                 .where(
-                        merchantUidContains(dto.merchantUid()),
+                        merchantUidStartWith(dto.merchantUid()),
                         orderStatusEq(dto.orderStatus()),
                         dateBetween(dto.startDate(), dto.endDate()),
                         memberEmailEq(dto.memberEmail()),
@@ -59,7 +59,7 @@ public class OrderQueryRepository {
                 .from(purchaseOrder)
                 .leftJoin(purchaseOrder.member, member)
                 .where(
-                        merchantUidContains(dto.merchantUid()),
+                        merchantUidStartWith(dto.merchantUid()),
                         orderStatusEq(dto.orderStatus()),
                         dateBetween(dto.startDate(), dto.endDate()),
                         memberEmailEq(dto.memberEmail()),
@@ -83,7 +83,7 @@ public class OrderQueryRepository {
                 .from(purchaseOrder)
                 .where(
                         purchaseOrder.member.id.eq(memberId),
-                        merchantUidContains(dto.merchantUid()),
+                        merchantUidStartWith(dto.merchantUid()),
                         dateBetween(dto.startDate(), dto.endDate()),
                         purchaseOrder.isDeleted.isFalse()
                 )
@@ -97,7 +97,7 @@ public class OrderQueryRepository {
                 .from(purchaseOrder)
                 .where(
                         purchaseOrder.member.id.eq(memberId),
-                        merchantUidContains(dto.merchantUid()),
+                        merchantUidStartWith(dto.merchantUid()),
                         dateBetween(dto.startDate(), dto.endDate()),
                         purchaseOrder.isDeleted.isFalse()
                 )
@@ -123,8 +123,8 @@ public class OrderQueryRepository {
         return Optional.ofNullable(result);
     }
 
-    private BooleanExpression merchantUidContains(String merchantUid) {
-        return StringUtils.hasText(merchantUid) ? purchaseOrder.merchantUid.contains(merchantUid) : null;
+    private BooleanExpression merchantUidStartWith(String merchantUid) {
+        return StringUtils.hasText(merchantUid) ? purchaseOrder.merchantUid.startsWith(merchantUid) : null;
     }
 
     private BooleanExpression orderStatusEq(OrderStatus orderStatus) {

@@ -170,7 +170,7 @@ public class OrderService {
         Member user = requireUser(member);
 
         PurchaseOrder order = orderQueryRepository.findOrderDetail(orderId)
-                .orElseThrow(()-> new IllegalArgumentException("주문 찾울 수 없음"));
+                .orElseThrow(() -> new IllegalArgumentException("주문 찾울 수 없음"));
 
         order.validateOwner(user);
 
@@ -192,10 +192,7 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("주문 찾을 수 없음:" + orderId));
 
         //배송시작 or 배송 완료일때
-        if (order.getOrderStatus() == OrderStatus.SHIPPED
-                || order.getOrderStatus() == OrderStatus.DELIVERED) {
-            throw new IllegalStateException("배송 시작 또는 배송 완료 주문은 수정 불가");
-        }
+        order.getOrderStatus().validateNext(newStatus);
         order.setOrderStatus(newStatus);
     }
 

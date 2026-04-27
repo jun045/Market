@@ -16,7 +16,20 @@ public record ReviewResponse(Long reviewId,
                              LocalDateTime createdAt,
                              LocalDateTime updatedAt) {
 
-    public static ReviewResponse from(Review review){
+    public static ReviewResponse from(ReviewRaw raw){
+        return ReviewResponse.builder()
+                .reviewId(raw.reviewId())
+                .nickname(raw.nickname())
+                .productName(raw.productName())
+                .option(raw.options())
+                .rating(raw.rating())
+                .content(raw.content())
+                .createdAt(raw.createdAt())
+                .updatedAt(raw.updatedAt())
+                .build();
+    }
+
+    public static ReviewResponse from (Review review){
         return ReviewResponse.builder()
                 .reviewId(review.getId())
                 .nickname(review.getMember().getNickname())
@@ -29,7 +42,7 @@ public record ReviewResponse(Long reviewId,
                 .build();
     }
 
-    public static List<ReviewResponse> fromList (List<Review> reviews){
+    public static List<ReviewResponse> fromList (List<ReviewRaw> reviews){
         return reviews.stream().map(ReviewResponse::from).toList();
     }
 }

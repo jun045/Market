@@ -6,12 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.market.Brand.BrandRepository;
+import project.market.PageResponse;
 import project.market.member.Entity.Member;
 import project.market.member.MemberRepository;
 import project.market.member.enums.Role;
-import project.market.product.dto.CreateProductRequest;
-import project.market.product.dto.ProductResponse;
-import project.market.product.dto.ProductSearchResponse;
+import project.market.product.dto.*;
 
 import java.util.List;
 
@@ -90,6 +89,24 @@ public class ProductService {
     //전체 목록 조회 (이름, 가격만)
     public Page<ProductSearchResponse> findAll(Pageable pageable) {
         return productQueryRepository.findAllProducts(pageable);
+    }
+
+    public PageResponse<AdminProductSearchResponse> findAllForAdmin (Member member,
+                                                             Long categoryId,
+                                                             Long brandId,
+                                                             String brandName,
+                                                             String keyword,
+                                                             ProductStatus productStatus,
+                                                             Boolean isDeleted,
+                                                             Pageable pageable){
+
+        Page<AdminProductSearchRaw> allProductsForAdmin = productQueryRepository.findAllProductsForAdmin(pageable, categoryId, brandId, brandName, keyword, productStatus, isDeleted);
+        List<AdminProductSearchResponse> contents = allProductsForAdmin.getContent().stream().map(AdminProductSearchResponse::from).toList();
+
+        long totalElements = allProductsForAdmin.getTotalElements();
+
+        return PageResponse.of(contents, totalElements, pageable);
+
     }
 
     //상세조회

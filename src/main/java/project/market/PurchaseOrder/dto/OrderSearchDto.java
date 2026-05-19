@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 public record OrderSearchDto(
         String merchantUid,
+        String productName,
         OrderStatus orderStatus,
         LocalDateTime startDate,
         LocalDateTime endDate,

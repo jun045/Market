@@ -458,6 +458,144 @@ public class OrderTest {
         assertThat(orderDetail.id()).isEqualTo(orderId);
     }
 
+    //검색 테스트
+    @DisplayName("사용자 - 상품명으로 주문 검색")
+    @Test
+    void 사용자_상품명검색() {
+        //주문 생성
+        CreateOrderItemRequest orderItemRequest = new CreateOrderItemRequest(testVariantId, 1);
+
+        RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .body(new CreateOrderRequest(0, List.of(orderItemRequest)))
+                .when()
+                .post("/api/v1/orders")
+                .then()
+                .statusCode(200);
+
+        // 상품명 일부로 검색 ("상품이름1" 중 "상품" 으로 검색)
+        List<OrderListResponse> orders = RestAssured
+                .given().log().all()
+                .header("Authorization", "Bearer " + userToken)
+                .queryParam("productName", "상품")
+                .queryParam("page", 0)
+                .queryParam("size", 20)
+                .when()
+                .get("/api/v1/orders")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", OrderListResponse.class);
+
+        assertThat(orders).isNotEmpty();
+    }
+
+    @DisplayName("사용자 - 없는 상품명 검색시 빈 결과")
+    @Test
+    void 사용자_없는상품명검색() {
+        // 주문 생성
+        CreateOrderItemRequest orderItemRequest = new CreateOrderItemRequest(testVariantId, 1);
+        RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .body(new CreateOrderRequest(0, List.of(orderItemRequest)))
+                .when()
+                .post("/api/v1/orders")
+                .then()
+                .statusCode(200);
+
+        // 없는 상품명으로 검색
+        List<OrderListResponse> orders = RestAssured
+                .given().log().all()
+                .header("Authorization", "Bearer " + userToken)
+                .queryParam("productName", "없는상품명")
+                .queryParam("page", 0)
+                .queryParam("size", 20)
+                .when()
+                .get("/api/v1/orders")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", OrderListResponse.class);
+
+        assertThat(orders).isEmpty();
+    }
+
+    @DisplayName("관리자 - 주문번호로 검색")
+    @Test
+    void 관리자_주문번호검색() {
+        // 주문 생성
+        CreateOrderItemRequest orderItemRequest = new CreateOrderItemRequest(testVariantId, 1);
+        OrderDetailResponse order = RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .body(new CreateOrderRequest(0, List.of(orderItemRequest)))
+                .when()
+                .post("/api/v1/orders")
+                .then()
+                .statusCode(200)
+                .extract()
+                .as(OrderDetailResponse.class);
+
+        // merchantUid 앞부분으로 검색
+        String prefix = order.merchantUid().substring(0, 6); // "order_" 앞 6글자
+
+        List<OrderListResponse> orders = RestAssured
+                .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
+                .queryParam("merchantUid", prefix)
+                .queryParam("page", 0)
+                .queryParam("size", 20)
+                .when()
+                .get("/api/v1/admin/orders")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", OrderListResponse.class);
+
+        assertThat(orders).isNotEmpty();
+        assertThat(orders.get(0).id()).isEqualTo(order.id());
+    }
+
+    @DisplayName("관리자 - 상품명으로 검색")
+    @Test
+    void 관리자_상품명검색() {
+        // 주문 생성
+        CreateOrderItemRequest orderItemRequest = new CreateOrderItemRequest(testVariantId, 1);
+        RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .body(new CreateOrderRequest(0, List.of(orderItemRequest)))
+                .when()
+                .post("/api/v1/orders")
+                .then()
+                .statusCode(200);
+
+        List<OrderListResponse> orders = RestAssured
+                .given().log().all()
+                .header("Authorization", "Bearer " + adminToken)
+                .queryParam("productName", "상품이름")
+                .queryParam("page", 0)
+                .queryParam("size", 20)
+                .when()
+                .get("/api/v1/admin/orders")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", OrderListResponse.class);
+
+        assertThat(orders).isNotEmpty();
+    }
+
     @DisplayName("장바구니 상품 주문 생성")
     @Test
     void 장바구니상품_주문생성() {
@@ -521,8 +659,7 @@ public class OrderTest {
     }
 
 
-
-    private void logPerfMetric (Response res){
+    private void logPerfMetric(Response res) {
         PerfMetrics metrics = PerfMetrics.from(res);
         System.out.println(metrics.format());
     }

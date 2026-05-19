@@ -30,7 +30,7 @@ import static project.market.product.QProduct.product;
 public class OrderQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
-    //관리자용 -전체조회 + 검색
+    //관리자용 -전체조회 + 검색(주문번호, 제품명)
     public Page<OrderListResponse> searchOrders(OrderSearchDto dto, Pageable pageable) {
         List<OrderListResponse> content = jpaQueryFactory
                 .select(Projections.constructor(OrderListResponse.class,
@@ -42,24 +42,33 @@ public class OrderQueryRepository {
                 ))
                 .from(purchaseOrder)
                 .leftJoin(purchaseOrder.member, member)
+                .leftJoin(purchaseOrder.orderItems, orderItem)
+                .leftJoin(orderItem.productVariant, productVariant)
+                .leftJoin(productVariant.product, product)
                 .where(
                         merchantUidStartWith(dto.merchantUid()),
+                        productNameContains(dto.productName()),
                         orderStatusEq(dto.orderStatus()),
                         dateBetween(dto.startDate(), dto.endDate()),
                         memberEmailEq(dto.memberEmail()),
                         purchaseOrder.isDeleted.isFalse()
                 )
+                .distinct()
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(purchaseOrder.orderDate.desc())
                 .fetch();
 
         Long total = jpaQueryFactory
-                .select(purchaseOrder.count())
+                .select(purchaseOrder.countDistinct())
                 .from(purchaseOrder)
                 .leftJoin(purchaseOrder.member, member)
+                .leftJoin(purchaseOrder.orderItems, orderItem)
+                .leftJoin(orderItem.productVariant, productVariant)
+                .leftJoin(productVariant.product, product)
                 .where(
                         merchantUidStartWith(dto.merchantUid()),
+                        productNameContains(dto.productName()),
                         orderStatusEq(dto.orderStatus()),
                         dateBetween(dto.startDate(), dto.endDate()),
                         memberEmailEq(dto.memberEmail()),
@@ -70,7 +79,7 @@ public class OrderQueryRepository {
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }
 
-    //사용자용 - 전체조회 + 검색
+    //사용자용 - 전체조회 + 검색(제품명)
     public Page<OrderListResponse> searchUserOrders(Long memberId, UserOrderSearchDto dto, Pageable pageable) {
         List<OrderListResponse> content = jpaQueryFactory
                 .select(Projections.constructor(OrderListResponse.class,
@@ -81,23 +90,30 @@ public class OrderQueryRepository {
                         purchaseOrder.payAmount
                 ))
                 .from(purchaseOrder)
+                .leftJoin(purchaseOrder.orderItems, orderItem)
+                .leftJoin(orderItem.productVariant, productVariant)
+                .leftJoin(productVariant.product, product)
                 .where(
                         purchaseOrder.member.id.eq(memberId),
-                        merchantUidStartWith(dto.merchantUid()),
+                        productNameContains(dto.productName()),
                         dateBetween(dto.startDate(), dto.endDate()),
                         purchaseOrder.isDeleted.isFalse()
                 )
+                .distinct()
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(purchaseOrder.orderDate.desc())
                 .fetch();
 
         Long total = jpaQueryFactory
-                .select(purchaseOrder.count())
+                .select(purchaseOrder.countDistinct())
                 .from(purchaseOrder)
+                .leftJoin(purchaseOrder.orderItems, orderItem)
+                .leftJoin(orderItem.productVariant, productVariant)
+                .leftJoin(productVariant.product, product)
                 .where(
                         purchaseOrder.member.id.eq(memberId),
-                        merchantUidStartWith(dto.merchantUid()),
+                        productNameContains(dto.productName()),
                         dateBetween(dto.startDate(), dto.endDate()),
                         purchaseOrder.isDeleted.isFalse()
                 )
@@ -124,7 +140,13 @@ public class OrderQueryRepository {
     }
 
     private BooleanExpression merchantUidStartWith(String merchantUid) {
-        return StringUtils.hasText(merchantUid) ? purchaseOrder.merchantUid.startsWith(merchantUid) : null;
+        return StringUtils.hasText(merchantUid)
+                ? purchaseOrder.merchantUid.startsWith(merchantUid) : null;
+    }
+
+    private BooleanExpression productNameContains(String productName){
+        return StringUtils.hasText(productName)
+                ? product.productName.containsIgnoreCase(productName) : null;
     }
 
     private BooleanExpression orderStatusEq(OrderStatus orderStatus) {

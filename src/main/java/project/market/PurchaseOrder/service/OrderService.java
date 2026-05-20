@@ -131,7 +131,7 @@ public class OrderService {
     }
 
     //주문 전체 조회 + 검색 기능 - 관리자용
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<OrderListResponse> adminSearchOrders(Member member,
                                                      OrderSearchDto dto,
                                                      Pageable pageable) {

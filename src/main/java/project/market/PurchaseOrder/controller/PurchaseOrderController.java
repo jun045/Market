@@ -34,14 +34,14 @@ public class PurchaseOrderController {
         return orderService.createOrder(member, request);
     }
 
-    //전체 조회 - 사용자
+    //전체 조회 - 사용자(상품명)
     @GetMapping("/orders")
     public Page<OrderListResponse> userFindAllOrder(@AuthenticationPrincipal(expression = "member") Member member,
-                                                    @RequestParam(required = false) String merchantUid,
+                                                    @RequestParam(required = false) String productName,
                                                     @RequestParam(required = false) LocalDateTime startDate,
                                                     @RequestParam(required = false) LocalDateTime endDate,
                                                     @PageableDefault(size = 20) Pageable pageable) {
-        UserOrderSearchDto dto = new UserOrderSearchDto(merchantUid, startDate, endDate);
+        UserOrderSearchDto dto = new UserOrderSearchDto(productName, startDate, endDate);
         return orderService.userFindAllOrder(member, dto, pageable);
     }
 
@@ -70,17 +70,18 @@ public class PurchaseOrderController {
     /**
      * 관리자
      **/
-    //전체 조회 + 검색 기능(주문번호, 이메일,기간,주문상태) - 관리자
+    //전체 조회 + 검색 기능(주문번호,상품명,이메일,기간,주문상태) - 관리자
     @GetMapping("/admin/orders")
     public Page<OrderListResponse> adminFindAllOrder(
             @AuthenticationPrincipal(expression = "member") Member member,
             @RequestParam(required = false) String merchantUid,
+            @RequestParam(required = false) String productName,
             @RequestParam(required = false) OrderStatus orderStatus,
             @RequestParam(required = false) LocalDateTime startDate,
             @RequestParam(required = false) LocalDateTime endDate,
             @RequestParam(required = false) String memberEmail,
             @PageableDefault(size = 20) Pageable pageable) {
-        OrderSearchDto dto = new OrderSearchDto(merchantUid, orderStatus, startDate, endDate, memberEmail);
+        OrderSearchDto dto = new OrderSearchDto(merchantUid, productName, orderStatus, startDate, endDate, memberEmail);
         return orderService.adminSearchOrders(member, dto, pageable);
     }
 

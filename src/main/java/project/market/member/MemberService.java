@@ -2,12 +2,19 @@ package project.market.member;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.market.PageResponse;
 import project.market.auth.JwtProvider;
 import project.market.member.Entity.Member;
 import project.market.member.dto.*;
+import project.market.member.enums.Level;
+import project.market.member.enums.MemberStatus;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -16,6 +23,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final MemberQueryRepository memberQueryRepository;
 
     //회원가입
     public UserSignupResponse createUser(@Valid CreateUserSignupRequest request){
@@ -110,6 +118,21 @@ public class MemberService {
         }
 
         user.softDelete();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<UserListResponse> getAllMember (Pageable pageable,
+                                                        String loginId,
+                                                        String email,
+                                                        Level level,
+                                                        MemberStatus memberStatus){
+
+        Page<UserListResponse> allUsers = memberQueryRepository.getAllUsers(pageable, loginId, email, level, memberStatus);
+        List<UserListResponse> content = allUsers.getContent();
+
+        long totalElements = allUsers.getTotalElements();
+
+        return PageResponse.of(content, totalElements, pageable);
     }
 
 }

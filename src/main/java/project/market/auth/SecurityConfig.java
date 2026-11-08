@@ -31,6 +31,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/error").permitAll() //예외 발생 시 에러 응답이 403으로 바뀌지 않도록
                         .requestMatchers("/api/v1/members","/api/v1/members/login").permitAll() //회원가입,로그인 누구나
                         .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll() //상품 조회 누구나
                         .requestMatchers("/api/v1/admin/**").hasRole("SELLER") //관리자 전용

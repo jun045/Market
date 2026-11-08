@@ -10,5 +10,6 @@ public record AdminProductSearchRaw(Long productId,
                                     String productName,
                                     int price,
                                     ProductStatus productStatus,
-                                    boolean isDeleted) {
+                                    boolean isDeleted,
+                                    String thumb) {
 }

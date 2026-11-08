@@ -19,4 +19,4 @@ npm run dev                  # http://localhost:3000
 | --- | --- |
 | `BACKEND_URL` | 백엔드 서버 주소 (서버 전용) |
 | `NEXT_PUBLIC_IAMPORT_MERCHANT_CODE` | 아임포트 가맹점 식별코드 (백엔드 `IMPORT_CLIENT_KEY`와 동일) |
-| `NEXT_PUBLIC_IAMPORT_PG` | 아임포트 PG 코드 (기본 `nice`) |
+| `NEXT_PUBLIC_IAMPORT_PG` | 아임포트 PG 코드 (기본 `html5_inicis`, KG이니시스) |

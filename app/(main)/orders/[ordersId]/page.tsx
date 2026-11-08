@@ -14,7 +14,7 @@ import type { OrderDetail, OrderItem } from "@/types/order";
 import styles from "./page.module.css";
 
 const IMP_MERCHANT_CODE = process.env.NEXT_PUBLIC_IAMPORT_MERCHANT_CODE ?? "";
-const IMP_PG = process.env.NEXT_PUBLIC_IAMPORT_PG || "nice";
+const IMP_PG = process.env.NEXT_PUBLIC_IAMPORT_PG || "html5_inicis";
 
 export default function OrderDetailPage() {
   const router = useRouter();

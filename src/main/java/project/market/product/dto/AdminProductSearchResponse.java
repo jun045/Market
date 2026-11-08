@@ -12,6 +12,7 @@ public record AdminProductSearchResponse(Long productId,
                                          String productName,
                                          int price,
                                          ProductStatus productStatus,
+                                         String thumb,
                                          boolean isDeleted
                                          ) {
 
@@ -26,6 +27,7 @@ public record AdminProductSearchResponse(Long productId,
                 .price(raw.price())
                 .productStatus(raw.productStatus())
                 .isDeleted(raw.isDeleted())
+                .thumb(raw.thumb())
                 .build();
     }
 }

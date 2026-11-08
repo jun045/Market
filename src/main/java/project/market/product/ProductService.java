@@ -86,11 +86,25 @@ public class ProductService {
                 productUpdate.getListPrice());
     }
 
-    //전체 목록 조회 (이름, 가격만)
-    public Page<ProductSearchResponse> findAll(Pageable pageable) {
-        return productQueryRepository.findAllProducts(pageable);
+    // 사용자용 전체 목록 조회 (이름, 가격만) - 검색(brandName, productName: Gin+trigm 검색, categoryId, brandId: 완전일치)
+    // 관리용과 달리 삭제된 상품 노출 X (isDeleted = false 만 노출)
+    public PageResponse<ProductSearchResponse> findAll(Pageable pageable,
+                                               Long categoryId,
+                                               Long brandId,
+                                               String brandName,
+                                               String keyword,
+                                               ProductStatus productStatus) {
+
+        Page<ProductSearchRaw> allProducts = productQueryRepository.findAllProducts(pageable, categoryId, brandId, brandName, keyword, productStatus);
+        List<ProductSearchResponse> contents = allProducts.getContent().stream().map(ProductSearchResponse::from).toList();
+
+        long totalElements = allProducts.getTotalElements();
+
+        return PageResponse.of(contents, totalElements, pageable);
     }
 
+
+    // 관리자용 상품 조회 - 검색(brandName, productName: GIN+trigm 검색, CategoryId, brandId: 완전일치)
     public PageResponse<AdminProductSearchResponse> findAllForAdmin (Member member,
                                                              Long categoryId,
                                                              Long brandId,

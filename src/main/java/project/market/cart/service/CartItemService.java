@@ -29,6 +29,7 @@ public class CartItemService {
     private final ProductRepository productRepository;
 
     //카트 아이템 생성
+    @Transactional
     public CartItemResponse create (Member member, CreateCartItemRequest request){
 
         Member user = memberRepository.findById(member.getId()).orElseThrow(

@@ -2,6 +2,7 @@ package project.market;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import project.market.member.enums.MemberStatus;
 import project.market.member.enums.Role;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -179,6 +181,109 @@ public class MemberTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(200);
 
+    }
+
+    @DisplayName("loginId로 회원 부분검색")
+    @Test
+    public void loginId_부분검색(){
+        //given : setUp에 admin, user1, user2 존재
+        //when : "user" 로 검색
+        Response response = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + getToken("admin"))
+                .queryParam("loginId", "user")
+                .when()
+                .get("api/v1/admin/users")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        //then : user1, user2 만 조회되고 admin 은 제외된다
+        List<UserListResponse> users = response
+                .jsonPath()
+                .getList("content", UserListResponse.class);
+
+        int totalElements = response.jsonPath().getInt("pageInfo.totalElement");
+
+        assertThat(users).hasSize(2);
+        assertThat(totalElements).isEqualTo(2);
+        assertThat(users).extracting("loginId")
+                .containsExactlyInAnyOrder("user1", "user2");
+        assertThat(users).extracting("loginId")
+                .allMatch(loginId -> ((String) loginId).contains("user"));
+    }
+
+    @DisplayName("email로 회원 부분검색")
+    @Test
+    public void email_부분검색(){
+        //when : "user1@" 로 검색
+        Response response = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + getToken("admin"))
+                .queryParam("email", "user1@")
+                .when()
+                .get("api/v1/admin/users")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        //then : user1 만 조회된다
+        List<UserListResponse> users = response
+                .jsonPath()
+                .getList("content", UserListResponse.class);
+
+        int totalElements = response.jsonPath().getInt("pageInfo.totalElement");
+
+        assertThat(users).hasSize(1);
+        assertThat(totalElements).isEqualTo(1);
+        assertThat(users.get(0).loginId()).isEqualTo("user1");
+    }
+
+    @DisplayName("검색조건이 없으면 전체 회원이 조회된다")
+    @Test
+    public void 검색조건없으면_전체조회(){
+        //when : 조건 없이 조회
+        Response response = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + getToken("admin"))
+                .when()
+                .get("api/v1/admin/users")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        //then : admin, user1, user2 전체 조회
+        int totalElements = response.jsonPath().getInt("pageInfo.totalElement");
+        assertThat(totalElements).isEqualTo(3);
+    }
+
+    @DisplayName("매칭되는 회원이 없으면 빈 결과가 조회된다")
+    @Test
+    public void 검색_매칭없음(){
+        //when : 존재하지 않는 loginId 로 검색
+        Response response = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + getToken("admin"))
+                .queryParam("loginId", "존재하지않는아이디")
+                .when()
+                .get("api/v1/admin/users")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        //then
+        List<UserListResponse> users = response
+                .jsonPath()
+                .getList("content", UserListResponse.class);
+
+        int totalElements = response.jsonPath().getInt("pageInfo.totalElement");
+
+        assertThat(users).isEmpty();
+        assertThat(totalElements).isZero();
     }
 
 

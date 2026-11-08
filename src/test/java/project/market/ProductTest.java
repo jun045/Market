@@ -184,9 +184,9 @@ public class ProductTest {
                 .jsonPath()
                 .getList("content", ProductSearchResponse.class);
 
-        int totalElements = response.jsonPath().getInt("totalElements");
-        int totalPages = response.jsonPath().getInt("totalPages");
-        int size = response.jsonPath().getInt("size");
+        int totalElements = response.jsonPath().getInt("pageInfo.totalElement");
+        int totalPages = response.jsonPath().getInt("pageInfo.totalPage");
+        int size = response.jsonPath().getInt("pageInfo.size");
 
         assertThat(products).isNotEmpty();
         assertThat(products).extracting("id").contains(product1.id());
@@ -313,10 +313,10 @@ public class ProductTest {
                 .jsonPath()
                 .getList("content", ProductSearchResponse.class);
 
-        int totalElements = response.jsonPath().getInt("totalElements");
-        int totalPages = response.jsonPath().getInt("totalPages");
-        int size = response.jsonPath().getInt("size");
-        int numberOfElements = response.jsonPath().getInt("numberOfElements");
+        int totalElements = response.jsonPath().getInt("pageInfo.totalElement");
+        int totalPages = response.jsonPath().getInt("pageInfo.totalPage");
+        int size = response.jsonPath().getInt("pageInfo.size");
+        int numberOfElements = products.size();  // PageResponse엔 numberOfElements가 없어 content 크기로 대체
 
         assertThat(products).hasSize(20);  // 첫 페이지는 20개
         assertThat(totalElements).isGreaterThanOrEqualTo(25);  // 전체 25개 이상
@@ -327,6 +327,115 @@ public class ProductTest {
         assertThat(products.get(0).id()).isNotNull();
         assertThat(products.get(0).productName()).isNotNull();
         assertThat(products.get(0).price()).isGreaterThan(0);
+    }
+
+    @DisplayName("키워드로 상품명 부분검색")
+    @Test
+    void 키워드_상품명_부분검색() {
+        //given : 검색 대상 상품들 생성
+        createProduct("맥북프로16");
+        createProduct("맥북에어13");
+        createProduct("아이폰15");
+
+        //when : "맥북" 키워드로 검색
+        Response response = RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParam("keyword", "맥북")
+                .when()
+                .get("/api/v1/products")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        logPerfMetric(response);
+
+        //then : "맥북"이 들어간 상품만 조회되고, 아이폰은 제외된다
+        List<ProductSearchResponse> products = response
+                .jsonPath()
+                .getList("content", ProductSearchResponse.class);
+
+        int totalElements = response.jsonPath().getInt("pageInfo.totalElement");
+
+        assertThat(products).hasSize(2);
+        assertThat(totalElements).isEqualTo(2);
+        assertThat(products).extracting("productName")
+                .containsExactlyInAnyOrder("맥북프로16", "맥북에어13");
+        assertThat(products).extracting("productName")
+                .allMatch(name -> ((String) name).contains("맥북"));
+    }
+
+    @DisplayName("키워드가 없으면 전체가 조회된다")
+    @Test
+    void 키워드_없으면_전체조회() {
+        //given
+        createProduct("맥북프로16");
+        createProduct("아이폰15");
+
+        //when : keyword 미지정
+        Response response = RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/api/v1/products")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        //then : 필터 없이 전체 조회
+        int totalElements = response.jsonPath().getInt("pageInfo.totalElement");
+        assertThat(totalElements).isEqualTo(2);
+    }
+
+    @DisplayName("매칭되는 상품이 없으면 빈 결과가 조회된다")
+    @Test
+    void 키워드_매칭없음() {
+        //given
+        createProduct("맥북프로16");
+
+        //when : 존재하지 않는 키워드로 검색
+        Response response = RestAssured
+                .given().log().all()
+                .contentType(ContentType.JSON)
+                .queryParam("keyword", "존재하지않는상품")
+                .when()
+                .get("/api/v1/products")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        //then
+        List<ProductSearchResponse> products = response
+                .jsonPath()
+                .getList("content", ProductSearchResponse.class);
+
+        int totalElements = response.jsonPath().getInt("pageInfo.totalElement");
+
+        assertThat(products).isEmpty();
+        assertThat(totalElements).isZero();
+    }
+
+    private ProductResponse createProduct(String name) {
+        return RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
+                .body(new CreateProductRequest(
+                        name,
+                        name + " 설명",
+                        name + " 썸네일",
+                        name + " 상세",
+                        10000
+                ))
+                .when()
+                .post("/api/v1/admin/products")
+                .then()
+                .statusCode(200)
+                .extract()
+                .as(ProductResponse.class);
     }
 
     private void logPerfMetric (Response res){

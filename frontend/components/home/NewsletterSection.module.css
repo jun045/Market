@@ -1,0 +1,41 @@
+.section {
+  padding: 40px 0;
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.desc {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.button {
+  padding: 12px 24px;
+  background: #ffffff;
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  transition: var(--transition-base);
+}
+
+.button:hover {
+  background: var(--color-accent-light);
+}

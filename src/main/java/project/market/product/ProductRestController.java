@@ -42,8 +42,13 @@ public class ProductRestController {
 
     //상품 전체 조회
     @GetMapping("/products")
-    public Page<ProductSearchResponse> findAll(@PageableDefault(size = 20) Pageable pageable) {
-        return productService.findAll(pageable);
+    public PageResponse<ProductSearchResponse> findAll(@RequestParam(required = false) Long categoryId,
+                                               @RequestParam(required = false) Long brandId,
+                                               @RequestParam(required = false) String brandName,
+                                               @RequestParam(required = false) String keyword,
+                                               @RequestParam(required = false) ProductStatus productStatus,
+                                               @PageableDefault(size = 20) Pageable pageable) {
+        return productService.findAll(pageable, categoryId, brandId, brandName, keyword, productStatus);
     }
 
     //관리자용 상품 조회
@@ -57,6 +62,7 @@ public class ProductRestController {
                                                                   @RequestParam(required = false) ProductStatus productStatus,
                                                                   @RequestParam(required = false) Boolean isDeleted,
                                                                   @PageableDefault(size = 20) Pageable pageable){
+
         return productService.findAllForAdmin(member, categoryId, brandId, brandName, keyword, productStatus, isDeleted, pageable);
 
     }

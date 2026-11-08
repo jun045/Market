@@ -1,0 +1,19 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.line {
+  width: 32px;
+  height: 2px;
+  background: var(--color-primary);
+}
+
+.text {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+}

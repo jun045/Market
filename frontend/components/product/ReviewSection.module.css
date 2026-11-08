@@ -1,0 +1,102 @@
+.section {
+  margin-top: var(--spacing-3xl);
+  padding-top: var(--spacing-2xl);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  color: var(--color-text-primary);
+}
+
+.count {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+}
+
+.empty {
+  text-align: center;
+  padding: 48px 0;
+  font-size: 14px;
+  color: var(--color-text-placeholder);
+}
+
+/* 리뷰 목록 */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.item {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.item:first-child {
+  padding-top: 0;
+}
+
+.itemTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nickname {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.option {
+  font-size: 12px;
+  color: var(--color-text-placeholder);
+  padding: 2px 8px;
+  background: var(--color-bg-tertiary);
+  border-radius: 100px;
+}
+
+.date {
+  font-size: 12px;
+  color: var(--color-text-placeholder);
+}
+
+/* 별점 */
+.stars {
+  display: flex;
+  gap: 1px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.starFilled {
+  color: #f59e0b;
+}
+
+.starEmpty {
+  color: var(--color-border-light);
+}
+
+/* 리뷰 본문 */
+.content {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+}

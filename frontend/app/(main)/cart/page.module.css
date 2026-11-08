@@ -1,0 +1,342 @@
+.section {
+  padding: var(--spacing-2xl) 0 var(--spacing-3xl);
+}
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+.state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  font-size: 15px;
+  color: var(--color-text-tertiary);
+}
+
+.pageHeader {
+  margin-bottom: 28px;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+}
+
+/* 비어있는 상태 */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 80px 20px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--color-bg-secondary);
+}
+
+.emptyText {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+}
+
+.emptyLink {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-primary);
+  padding: 10px 22px;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  transition: var(--transition-base);
+}
+
+.emptyLink:hover {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+/* 레이아웃 */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 32px;
+  align-items: start;
+}
+
+/* 아이템 리스트 */
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.item {
+  display: grid;
+  grid-template-columns: auto 96px minmax(0, 1fr) auto auto auto;
+  gap: 20px;
+  align-items: center;
+  padding: 20px 4px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+  margin: 0;
+}
+
+.thumbLink {
+  display: block;
+  width: 96px;
+  height: 96px;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+}
+
+.thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.itemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.itemName {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  letter-spacing: -0.3px;
+  transition: color 0.18s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemName:hover {
+  color: var(--color-primary);
+}
+
+.itemOption {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+}
+
+.itemUnitPrice {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+/* 수량 */
+.quantityControl {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.qtyBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-secondary);
+  border: none;
+  font-size: 15px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+
+.qtyBtn:hover:not(:disabled) {
+  background: var(--color-border-light);
+}
+
+.qtyBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qtyValue {
+  width: 40px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.itemTotal {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-primary);
+  min-width: 110px;
+  text-align: right;
+}
+
+.deleteBtn {
+  background: none;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition-base);
+}
+
+.deleteBtn:hover:not(:disabled) {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
+
+.deleteBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 요약 */
+.summary {
+  position: sticky;
+  top: 80px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg, 12px);
+  padding: 24px;
+  background: #ffffff;
+}
+
+.summaryTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 18px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: 10px;
+}
+
+.summaryDivider {
+  height: 1px;
+  background: var(--color-border-light);
+  margin: 16px 0;
+}
+
+.selectedBox {
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.selectedHeader {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 10px;
+}
+
+.selectedBox .summaryRow {
+  margin-bottom: 8px;
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  padding-top: 10px;
+  margin-top: 6px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.summaryTotalPrice {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.orderButton {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+}
+
+/* 반응형 */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .summary {
+    position: static;
+  }
+
+  .item {
+    grid-template-columns: auto 80px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "check thumb info info"
+      "check thumb qty total"
+      "check thumb delete delete";
+    gap: 12px 16px;
+  }
+
+  .checkbox {
+    grid-area: check;
+    align-self: start;
+    margin-top: 6px;
+  }
+
+  .thumbLink {
+    grid-area: thumb;
+    width: 80px;
+    height: 80px;
+  }
+
+  .itemInfo {
+    grid-area: info;
+  }
+
+  .quantityControl {
+    grid-area: qty;
+  }
+
+  .itemTotal {
+    grid-area: total;
+  }
+
+  .deleteBtn {
+    grid-area: delete;
+    justify-self: start;
+  }
+}
